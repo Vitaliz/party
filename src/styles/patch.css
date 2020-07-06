@@ -1,0 +1,165 @@
+img {
+  -webkit-user-drag: none;
+  -webkit-app-region: no-drag;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  pointer-events: none;
+  user-select: none;
+}
+
+.Button--round {
+  border-radius: 999em;
+}
+
+.Button--ios {
+  transition: background-color 600ms cubic-bezier(.36, .66, .04, 1);
+  transition: background-color 600ms var(--ios-easing);
+}
+
+.Button--android {
+  transition: background-color 300ms cubic-bezier(.4, 0, .2, 1);
+  transition: background-color 300ms var(--android-easing);
+}
+
+.Button[disabled] {
+  opacity: 1;
+  background-color: var(--app-blue);
+}
+
+.Button.Button--green {
+  background-color: var(--app-green);
+}
+
+.Button.Button--red {
+  background-color: var(--app-red);
+}
+
+.Button.Button--blue {
+  color: var(--app-primary);
+  background-color: var(--app-black);
+}
+
+.Tappable--android .Tappable__waves {
+  border-radius: inherit;
+  will-change: transform;
+}
+
+.Panel--flex .Panel__in {
+  display: flex;
+  flex-direction: column;
+}
+
+.Panel--clear .Panel__in {
+  background-image: none;
+}
+
+.Header,
+.Div {
+  user-select: none;
+}
+
+.Div {
+  box-sizing: border-box;
+  line-height: 1.5;
+}
+
+.Panel--flex .Div {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: 1;
+}
+
+@media (min-width: 374px) {
+  .Div,
+  .Div--android,
+  .Div--ios {
+    padding: 12px 24px;
+  }
+}
+
+.Tabs {
+  background: transparent;
+}
+
+@media (min-width: 480px) {
+  .Tabs {
+    width: 100%;
+    flex-shrink: 0;
+    max-width: 462px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 700px) {
+  .Tabs {
+    max-width: 732px;
+  }
+}
+
+.ModalPage {
+  --text_primary: #3E3E3E;
+  --text_secondary: #818c99;
+  --background_content: #fff;
+}
+
+.ModalPage .ModalPage__in {
+  padding-top: 26px;
+}
+
+.ModalPage__in-wrap {
+  z-index: 1;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.ModalPage__header {
+  pointer-events: none;
+}
+
+.ModalPageHeader__shadow {
+  display: none;
+}
+
+.ModalPageHeader__content {
+  left: calc(50% - 18px);
+  width: 36px;
+  top: 6px;
+  height: 4px;
+  border-radius: 4px;
+  background-color: var(--text_secondary);
+}
+
+.ModalPageHeader__content,
+.ModalPageHeader--ios .ModalPageHeader__content,
+.ModalPageHeader--android .ModalPageHeader__content {
+  position: absolute;
+}
+
+.ActionSheet--android .ActionSheetItem__before + .ActionSheetItem__container {
+  --text_primary: #3E3E3E;
+}
+
+.Gallery {
+  height: 100%;
+  flex-grow: 1;
+}
+
+.Gallery--fill.Gallery--ios .Gallery__slide {
+  height: calc(100vh - 52px);
+  height: calc(100vh - var(--panelheader_height_ios, 52px) - var(--safe-area-inset-bottom, 0px) - var(--safe-area-inset-top, 20px));
+}
+
+.Gallery--fill.Gallery--android .Gallery__slide {
+  height: calc(100vh - 56px);
+  height: calc(100vh - var(--panelheader_height_android, 56px) - var(--safe-area-inset-bottom, 0px) - var(--safe-area-inset-top, 0px));
+}
+
+.View__popout:empty,
+.View__modal:empty {
+  display: none;
+}
+
+.Spinner {
+  margin: auto;
+}
