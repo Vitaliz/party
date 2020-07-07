@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;800&display=block');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=block');
 
 :root,
 body[scheme] {
@@ -15,10 +15,10 @@ html {
 
 html, body, div#root {
   font-family: 'Montserrat', 'Avenir Black', 'Verdana', 'Century Gothic', 'Arial Black', monospace, monospace;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-html, body {
+html, body, .scrollable {
   -webkit-overflow-scrolling: touch;
   -ms-scroll-chaining: none;
   -ms-overflow-style: none;
@@ -27,7 +27,8 @@ html, body {
 }
 
 html::-webkit-scrollbar,
-body::-webkit-scrollbar {
+body::-webkit-scrollbar,
+.scrollable::-webkit-scrollbar {
   height: 0;
   width: 0;
 }

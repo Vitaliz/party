@@ -20,7 +20,8 @@ module.exports = process.env.NODE_ENV === 'production' ?
     babelInclude([
       path.resolve('src'),
       path.resolve('node_modules/worker-timers-broker'),
-      path.resolve('node_modules/worker-timers')
+      path.resolve('node_modules/worker-timers'),
+      path.resolve('node_modules/react-tappable')
     ]),
     addBabelPlugin('macros'),
     addBabelPlugin('@babel/transform-react-constant-elements'),
@@ -60,7 +61,8 @@ module.exports = process.env.NODE_ENV === 'production' ?
     babelInclude([
       path.resolve('src'),
       path.resolve('node_modules/worker-timers-broker'),
-      path.resolve('node_modules/worker-timers')
+      path.resolve('node_modules/worker-timers'),
+      path.resolve('node_modules/react-tappable')
     ]),
     addBabelPlugin('macros'),
     addBabelPlugin('@babel/transform-react-constant-elements'),
