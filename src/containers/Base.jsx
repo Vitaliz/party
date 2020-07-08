@@ -1,13 +1,14 @@
 import React from 'react';
 
+import { CSSTransition } from 'react-transition-group';
+
 import App from './App';
 import Offline from '../components/common/Offline';
-
 import CommonError from '../components/error/CommonError';
 
 import sendError from '../utils/error';
+import initView from '../utils/view';
 import { interpretResponse } from '../utils/data';
-import { VIEW_SETTINGS_BASE, VIEW_SETTINGS_EXTENDED } from '../utils/constants';
 
 import { useState, useEffect, useMount } from '../hooks/base';
 import { useRouter } from '../hooks/router';
@@ -15,6 +16,7 @@ import { useBridge, useBus } from '../hooks/util';
 import { useModal } from '../hooks/overlay';
 import { useStorage, useStore } from '../hooks/store';
 import { useFetch } from '../hooks/fetch';
+import { usePlatform, ANDROID } from '@vkontakte/vkui';
 
 const Base = () => {
   const router = useRouter();
@@ -24,8 +26,10 @@ const Base = () => {
   const storage = useStorage();
   const store = useStore();
   const fetch = useFetch();
+  const platform = usePlatform();
 
   const [loaded, updateLoadState] = useState(false);
+  const [ready, updateReadyState] = useState(false);
   const [showOffline, setShowOffline] = useState(false);
 
   useMount(() => {
@@ -84,7 +88,7 @@ const Base = () => {
               return;
             default:
               window.requestAnimationFrame(() => {
-                setTimeout(() => {
+                window.setTimeout(() => {
                   window.requestAnimationFrame(() => {
                     resolve();
                   });
@@ -136,7 +140,7 @@ const Base = () => {
         window.onload = resolve;
 
         // fallback
-        setTimeout(resolve, 1E4); // 10s
+        window.setTimeout(resolve, 1E4); // 10s
       }
     });
 
@@ -159,12 +163,12 @@ const Base = () => {
             if (status === 'loaded' || status === 'error') {
               resolve();
             } else {
-              setTimeout(resolve, 1E3); // 1s
+              window.setTimeout(resolve, 1E3); // 1s
             }
           });
 
           // fallback
-          setTimeout(resolve, 1E4);  // 10s
+          window.setTimeout(resolve, 1E4);  // 10s
         }
       });
 
@@ -173,27 +177,6 @@ const Base = () => {
         ...store.persist,
         ...loaded.persist
       };
-    });
-
-    const updateView = () => {
-      if (bridge.supports('VKWebAppSetViewSettings')) {
-        bridge.send('VKWebAppSetViewSettings', VIEW_SETTINGS_BASE).catch(() => {
-          // See: https://github.com/VKCOM/vk-bridge/issues/103
-        });
-      }
-    };
-
-    bridge.subscribe((event) => {
-      if (!event || !event.detail) {
-        return;
-      }
-
-      switch (event.detail.type) {
-        case 'VKWebAppViewRestore':
-        case 'VKWebAppLocationChanged':
-          updateView();
-          break;
-      }
     });
 
     Promise.all([
@@ -208,33 +191,28 @@ const Base = () => {
 
   useEffect(() => {
     if (loaded) {
-      setTimeout(() => {
-        window.requestAnimationFrame(() => {
-          // app seems ready
-
-          // Plaform bug: flash WebView
-          // Workaround: send before WebAppInit
-          if (bridge.supports('VKWebAppSetViewSettings')) {
-            bridge.send('VKWebAppSetViewSettings', VIEW_SETTINGS_EXTENDED).catch(() => {
-              // See: https://github.com/VKCOM/vk-bridge/issues/103
-            });
-          }
-
-          bridge.send('VKWebAppInit');
+      window.requestAnimationFrame(() => {
+        // app seems ready
+        initView().then(() => {
+          window.requestAnimationFrame(() => {
+            updateReadyState(true);
+          });
         });
-      }, 600);
+      });
     }
   }, [loaded]);
 
   return (
     <React.StrictMode>
-      {
-        loaded ? (
-          <App />
-        ): (
-          <div className="Root" />
-        )
-      }
+      <CSSTransition in={ready} appear={true} classNames="Root--fade" timeout={platform === ANDROID ? 300 : 600}>
+        {
+          loaded ? (
+            <App />
+          ): (
+            <div className="Root" />
+          )
+        }
+      </CSSTransition>
       <Offline visible={showOffline} />
     </React.StrictMode>
   );

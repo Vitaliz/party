@@ -21,7 +21,7 @@ const router = {
 window.addEventListener('popstate', (e = window.event) => {
   const last = router.state;
   router.state = e.state;
-  setTimeout(() => {
+  window.setTimeout(() => {
     globalBus.emit('router:popstate', last);
   }, 0);
 });

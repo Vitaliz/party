@@ -8,10 +8,10 @@ export const APP_GROUP = +process.env.REACT_APP_APP_GROUP;
 
 export const VIEW_SETTINGS_BASE = {
   status_bar_style: 'light',
-  action_bar_color: '#355FDE'
+  action_bar_color: 'none'
 };
 export const VIEW_SETTINGS_EXTENDED = {
   status_bar_style: 'light',
-  action_bar_color: '#355FDE',
-  navigation_bar_color: '#537EF9'
+  action_bar_color: 'none',
+  navigation_bar_color: '#fff'
 };

@@ -22,8 +22,9 @@ if ('console' in context) {
   const SUPPORT_MESSAGE = 'Тех. поддержка:';
 
   try {
-    console.log(LOGO_TEMPLATE, LOGO_STYLE);
-    console.log(WARN_TEMPLATE, WARN_STYLE, WARN_MESSAGE);
-    console.log(SUPPORT_TEMPLATE, SUPPORT_STYLE, SUPPORT_MESSAGE, APP_SUPPORT);
+    const logger = (...params) => window.setTimeout(() => context.console.log(...params), 0);
+    logger(LOGO_TEMPLATE, LOGO_STYLE);
+    logger(WARN_TEMPLATE, WARN_STYLE, WARN_MESSAGE);
+    logger(SUPPORT_TEMPLATE, SUPPORT_STYLE, SUPPORT_MESSAGE, APP_SUPPORT);
   } catch { /* ignore */ }
 }

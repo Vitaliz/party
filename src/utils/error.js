@@ -19,7 +19,7 @@ const parseVKBridgeError = (error) => {
   }`;
 };
 
-export default (morph = window.event, raw, source) => {
+export default function sendError(morph = window.event, raw, source) {
   const send = {
     payload: null,
     type: null
@@ -67,4 +67,4 @@ export default (morph = window.event, raw, source) => {
     console.error(send.payload);
     return Promise.resolve(send);
   }
-};
+}

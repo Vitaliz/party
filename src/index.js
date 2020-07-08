@@ -5,8 +5,9 @@ import './styles/style.css';
 
 import './utils/context';
 import './utils/safe';
-import './utils/egg';
 import './utils/timers';
+import './utils/egg';
+import './utils/view';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
