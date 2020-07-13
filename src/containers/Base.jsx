@@ -59,6 +59,8 @@ const Base = () => {
     });
 
     const handleError = (error, source, lineno, colno, raw) => {
+      let errorModal = null;
+
       const send = () => {
         return sendError(error, raw, source).then((send) => {
           switch (send.type) {
@@ -66,7 +68,9 @@ const Base = () => {
             case 'network':
               return false;
             default:
-              modal.set(<CommonError />);
+              errorModal = (
+                <CommonError />
+              );
               return true;
           }
         }).catch((e) => {
@@ -102,10 +106,7 @@ const Base = () => {
       send().then((result) => {
         if (result) {
           return prepare().then(() => {
-            bus.once('modal:updated', () => {
-              bus.emit('modal:open');
-            });
-            bus.emit('modal:update');
+            modal.show(errorModal);
           });
         }
       });
@@ -118,7 +119,7 @@ const Base = () => {
 
   useMount(() => {
     const fetchUser = window.FAKE_FLAG ? () => {
-      return fetch.post('/vk-user/auth').then((response) => {
+      return fetch.post('/vkma/me').then((response) => {
         const user = interpretResponse(response);
         user.created = response.status === 200;
 
@@ -204,12 +205,18 @@ const Base = () => {
 
   return (
     <React.StrictMode>
-      <CSSTransition in={ready} appear={true} classNames="Root--fade" timeout={platform === ANDROID ? 300 : 600}>
+      <CSSTransition
+        in={ready}
+        appear={true}
+        mountOnEnter={true}
+        classNames="Root--fade"
+        timeout={platform === ANDROID ? 300 : 600}
+      >
         {
           loaded ? (
             <App />
           ): (
-            <div className="Root" />
+            <div className="Root Root--fade-init" />
           )
         }
       </CSSTransition>

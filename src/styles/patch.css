@@ -44,67 +44,24 @@ img {
   will-change: transform;
 }
 
-.Panel--flex .Panel__in {
-  display: flex;
-  flex-direction: column;
-}
-
-.Panel--clear .Panel__in {
-  background-image: none;
-}
-
 .Header,
 .Div {
   user-select: none;
 }
 
-.Div {
-  box-sizing: border-box;
-  line-height: 1.5;
-}
-
-.Panel--flex .Div {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  flex-shrink: 1;
-}
-
-@media (min-width: 374px) {
-  .Div,
-  .Div--android,
-  .Div--ios {
-    padding: 12px 24px;
-  }
-}
-
-.Tabs {
-  background: transparent;
-}
-
-@media (min-width: 480px) {
-  .Tabs {
-    width: 100%;
-    flex-shrink: 0;
-    max-width: 462px;
-    margin: 0 auto;
-  }
-}
-
-@media (min-width: 700px) {
-  .Tabs {
-    max-width: 732px;
-  }
-}
-
-.ModalPage {
-  --text_primary: #3E3E3E;
-  --text_secondary: #818c99;
-  --background_content: #fff;
+.ModalPage__in {
+  width: 482px;
 }
 
 .ModalPage .ModalPage__in {
   padding-top: 26px;
+}
+
+.ModalRoot__mask {
+  opacity: 1;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: opacity;
 }
 
 .ModalPage__in-wrap {
@@ -136,25 +93,6 @@ img {
   position: absolute;
 }
 
-.ActionSheet--android .ActionSheetItem__before + .ActionSheetItem__container {
-  --text_primary: #3E3E3E;
-}
-
-.Gallery {
-  height: 100%;
-  flex-grow: 1;
-}
-
-.Gallery--fill.Gallery--ios .Gallery__slide {
-  height: calc(100vh - 52px);
-  height: calc(100vh - var(--panelheader_height_ios, 52px) - var(--safe-area-inset-bottom, 0px) - var(--safe-area-inset-top, 20px));
-}
-
-.Gallery--fill.Gallery--android .Gallery__slide {
-  height: calc(100vh - 56px);
-  height: calc(100vh - var(--panelheader_height_android, 56px) - var(--safe-area-inset-bottom, 0px) - var(--safe-area-inset-top, 0px));
-}
-
 .View__popout:empty,
 .View__modal:empty {
   display: none;
@@ -162,4 +100,15 @@ img {
 
 .Spinner {
   margin: auto;
+}
+
+.PanelHeader--android .PanelHeader__content,
+.PanelHeader--ios .PanelHeader__content {
+  font-size: 26px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.SimpleCell__children {
+  font-weight: 500;
 }

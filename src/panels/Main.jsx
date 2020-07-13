@@ -7,6 +7,8 @@ import HorizontalScroll from '../components/common/HorizontalScroll';
 import Card from '../components/Card';
 import Subscribe from '../components/Subscribe';
 
+import { useImmutableCallback } from '../hooks/base';
+
 const MainTitle = styled.h1`
   font-size: 26px;
   line-height: 32px;
@@ -27,7 +29,23 @@ const MainSubscribe = styled(Subscribe)`
   margin: auto 0;
 `;
 
-const Main = ({ id }) => {
+const Main = ({ id, goForward }) => {
+  const openAlias = useImmutableCallback(() => {
+    goForward('alias');
+  });
+
+  const openStickers = useImmutableCallback(() => {
+    goForward('stickers');
+  });
+
+  const openCroco = useImmutableCallback(() => {
+    // callback('croco');
+  });
+
+  const openMafia = useImmutableCallback(() => {
+    // callback('mafia');
+  });
+
   return (
     <RichPanel
       id={id}
@@ -38,17 +56,19 @@ const Main = ({ id }) => {
       <MainHorizontalScroll>
         <Card
           color="yellow"
-          name="Алиасы"
+          name="Алиас"
           description="Объясняй слова!"
           count="4+"
           time="15 мин"
+          callback={openAlias}
         />
         <Card
           color="blue"
-          name="Стикеры"
+          name="Стикерочки"
           description="Угадай, кто ты!"
           count="2+"
           time="10 мин"
+          callback={openStickers}
         />
         <Card
           color="green"
@@ -56,6 +76,7 @@ const Main = ({ id }) => {
           description="Показывай без слов!"
           count="2+"
           time="10 мин"
+          callback={openCroco}
         />
         <Card
           color="gray"
@@ -63,6 +84,7 @@ const Main = ({ id }) => {
           description="Очисти город от мафии!"
           count="4+"
           time="15 мин"
+          callback={openMafia}
         />
       </MainHorizontalScroll>
     </RichPanel>
@@ -71,7 +93,7 @@ const Main = ({ id }) => {
 
 Main.propTypes = {
   id: PropTypes.string.isRequired,
-  callback: PropTypes.func.isRequired
+  goForward: PropTypes.func.isRequired
 };
 
 export default Main;

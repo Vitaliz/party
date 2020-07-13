@@ -1,14 +1,15 @@
-.Root--fade-enter,
-.Root--fade-appear,
-.Root--fade-exit-active,
-.Root--fade-exit-done {
+.Root.Root--fade-init,
+.Root.Root--fade-enter,
+.Root.Root--fade-appear,
+.Root.Root--fade-exit-active,
+.Root.Root--fade-exit-done {
   opacity: 0;
 }
-.Root--fade-exit,
-.Root--fade-enter-active,
-.Root--fade-enter-done,
-.Root--fade-appear-active,
-.Root--fade-appear-done {
+.Root.Root--fade-exit,
+.Root.Root--fade-enter-active,
+.Root.Root--fade-enter-done,
+.Root.Root--fade-appear-active,
+.Root.Root--fade-appear-done {
   opacity: 1;
 }
 .Root--ios.Root--fade-appear-active,

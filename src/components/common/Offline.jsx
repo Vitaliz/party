@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import { useState, useEffect, useCallback } from '../../hooks/base';
 import { useLockBody } from '../../hooks/dom';
-import { usePlatform, Group, Header, List, Cell } from '@vkontakte/vkui';
+import { usePlatform, Group, Header, List, SimpleCell as Cell } from '@vkontakte/vkui';
 
 const Offline = ({ visible = false }) => {
   const [show, setShow] = useState(visible);
@@ -45,7 +45,7 @@ const Offline = ({ visible = false }) => {
       <div className="Offline__group">
         <Group header={<Header mode="secondary">Интернет пропал</Header>}>
           <List>
-            <Cell multiline={true}>Без доступа в Интернет мы не сможем работать</Cell>
+            <Cell multiline={true} disabled={true}>Без доступа в Интернет мы не сможем работать</Cell>
           </List>
         </Group>
       </div>

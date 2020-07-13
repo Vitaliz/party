@@ -3,7 +3,7 @@ import styled from 'styled-components/macro';
 
 import { useStore } from '../hooks/store';
 import { useBridge } from '../hooks/util';
-import { useState, useCallback, useCompute } from '../hooks/base';
+import { useState, useImmutableCallback, useCompute } from '../hooks/base';
 
 import { APP_GROUP } from '../utils/constants';
 
@@ -18,14 +18,27 @@ const SubscribeShadow = styled.div`
   padding-bottom: 4px;
 `;
 
-const SubscribeContainer = styled.button`
-  background-image: linear-gradient(100deg, #FFC3A0 0%, #FFAFBD 100%);
+const SubscribeContainer = styled.div`
+  display: block;
+  text-decoration: none;
+
+  border: none;
+  outline: none;
+  margin: 0;
 
   position: relative;
+  top: 0;
+
+  width: 100%;
+  text-align: left;
+
+  background-image: linear-gradient(100deg, #FFC3A0 0%, #FFAFBD 100%);
+
   border-radius: 0 0 20px 20px;
   overflow: hidden;
 
   padding: 16px 20px;
+  box-sizing: border-box;
 `;
 
 const SubscribeTitle = styled.div`
@@ -56,30 +69,44 @@ const SubscribeImage = styled.img`
 const Subscribe = (props) => {
   const bridge = useBridge();
   const store = useStore();
-  const [follower, setFollower] = useState(store.user?.is_follower || !bridge.supports('VKWebAppJoinGroup'));
+  const [isFollower, setFollower] = useState(store.user?.is_follower || !bridge.supports('VKWebAppJoinGroup'));
 
-  const follow = useCallback(() => {
-    if (!follower) {
-      bridge.send('VKWebAppJoinGroup', {
-        'group_id': APP_GROUP
-      }).then((data) => {
-        store.user.is_follower = data && data.result;
-        setFollower(store.user.is_follower);
-      }).catch(() => {
-        setFollower(false);
-      });
-    } else {
-      window.open(`${bridge.isWebView() ? 'vk' : 'https'}://vk.com/public${APP_GROUP}`);
-    }
-  }, [follower]);
+  const follow = useImmutableCallback(() => {
+    bridge.send('VKWebAppJoinGroup', {
+      'group_id': APP_GROUP
+    }).then((data) => {
+      store.user.is_follower = data && data.result;
+      setFollower(store.user.is_follower);
+    }).catch(() => {
+      setFollower(false);
+    });
+  });
+
+  const component = useCompute(() => {
+    return isFollower ? 'a' : 'button';
+  });
+
+  const onClick = useCompute(() => {
+    return isFollower ? null : follow;
+  });
 
   const title = useCompute(() => {
-    return follower ? 'Наша группа' : 'Подпишись на нас';
+    return isFollower ? 'Наша группа' : 'Подпишись на нас';
+  });
+
+  const link = useCompute(() => {
+    return `${bridge.isWebView() ? 'vk' : 'https'}://vk.com/public${APP_GROUP}`;
   });
 
   return (
     <SubscribeShadow {...props}>
-      <SubscribeContainer as={Clickable} onClick={follow}>
+      <SubscribeContainer
+        as={Clickable}
+        component={component}
+        onClick={onClick}
+        href={link}
+        target="_blank"
+      >
         <SubscribeTitle>{title}</SubscribeTitle>
         <SubscribeDescription>Узнавай о новых играх!</SubscribeDescription>
         <SubscribeImage

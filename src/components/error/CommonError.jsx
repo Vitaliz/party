@@ -1,12 +1,12 @@
 import React from 'react';
-import { Group, Header, Cell, Button } from '@vkontakte/vkui';
+import { Group, Header, SimpleCell as Cell, Button } from '@vkontakte/vkui';
 
 import { APP_SUPPORT } from '../../utils/constants';
 
 const CommonError = () => {
   return (
     <Group header={<Header mode="secondary">Что-то пошло не так</Header>}>
-      <Cell multiline={true}>
+      <Cell multiline={true} disabled={true}>
         Произошла неизвестная ошибка.
       </Cell>
       <Cell>

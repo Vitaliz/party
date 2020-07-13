@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&display=block');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;900&display=block');
 
 :root,
 body[scheme] {
@@ -15,6 +15,18 @@ html {
 
 html, body, div#root {
   font-family: 'Montserrat', 'Avenir Black', 'Verdana', 'Century Gothic', 'Arial Black', monospace, monospace;
+}
+
+html,
+body,
+div,
+section,
+h1,
+h2,
+h3,
+h4,
+button,
+span {
   font-weight: 700;
 }
 
@@ -29,8 +41,10 @@ html, body, .scrollable {
 html::-webkit-scrollbar,
 body::-webkit-scrollbar,
 .scrollable::-webkit-scrollbar {
+  display: none;
   height: 0;
   width: 0;
+  background: transparent;
 }
 
 @import './animations.css';

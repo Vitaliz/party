@@ -3,6 +3,12 @@ import 'react-app-polyfill/stable';
 import '@vkontakte/vkui/dist/vkui.css';
 import './styles/style.css';
 
+if (process.env.NODE_ENV !== 'production') {
+  import(/* webpackChunkName: "eruda" */ 'eruda').then((module) => {
+    module.default.init();
+  });
+}
+
 import './utils/context';
 import './utils/safe';
 import './utils/timers';

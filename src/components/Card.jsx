@@ -76,6 +76,8 @@ const CardName = styled.div`
 `;
 
 const CardDescription = styled.div`
+  white-space: nowrap;
+
   font-size: 16px;
   line-height: 20px;
   margin-bottom: 24px;
@@ -114,7 +116,11 @@ const CardInfoBadge = styled.span`
 const Card = (props) => {
   return (
     <CardShadow $color={props.color}>
-      <CardContainer as={Clickable} $color={props.color}>
+      <CardContainer
+        as={Clickable}
+        onClick={props.callback}
+        $color={props.color}
+      >
         <CardName>{props.name}</CardName>
         <CardDescription>{props.description}</CardDescription>
         <CardInfo>
@@ -127,18 +133,23 @@ const Card = (props) => {
             <IconTime width={24} height={24} />
           </CardInfoBadge>
         </CardInfo>
-        <CardButton as={Clickable} component="button">Играть</CardButton>
+        <CardButton
+          as={Clickable}
+          onClick={props.callback}
+          component="button"
+        >Играть</CardButton>
       </CardContainer>
     </CardShadow>
   );
 };
 
 Card.propTypes = {
-  color: PropTypes.oneOf(['yellow', 'blue', 'green']).isRequired,
+  color: PropTypes.oneOf(['yellow', 'blue', 'green', 'gray']).isRequired,
   name: PropTypes.node.isRequired,
   description: PropTypes.node.isRequired,
   count: PropTypes.node.isRequired,
-  time: PropTypes.node.isRequired
+  time: PropTypes.node.isRequired,
+  callback: PropTypes.func
 };
 
 export default Card;

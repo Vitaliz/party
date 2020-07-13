@@ -1,7 +1,11 @@
 import React from 'react';
+
 import { ConfigProvider, Root } from '@vkontakte/vkui';
 
 import Home from '../views/Home';
+
+import AliasGame from '../modules/alias/views/AliasGame';
+import AliasPrepare from '../modules/alias/views/AliasPrepare';
 
 import { useState, useMount } from '../hooks/base';
 import { useBus, useBridge } from '../hooks/util';
@@ -12,7 +16,7 @@ const App = () => {
   const bridge = useBridge();
   const store = useStore();
 
-  const [view] = useState('home');
+  const [view, setView] = useState('home');
 
   useMount(() => {
     const test = /join-([0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i;
@@ -71,10 +75,18 @@ const App = () => {
     checkCodeOrFetch(window.location.hash);
   });
 
+  useMount(() => {
+    bus.on('app:view', (view) => {
+      setView(view);
+    });
+  });
+
   return (
     <ConfigProvider>
       <Root activeView={view}>
         <Home id="home" />
+        <AliasPrepare id="alias-prepare" />
+        <AliasGame id="alias-game" />
       </Root>
     </ConfigProvider>
   );

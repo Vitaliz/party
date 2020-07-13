@@ -56,10 +56,14 @@
     "ahooks": "^2.1.0",
     "babel-plugin-macros": "^2.8.0",
     "create-react-class": "^15.6.3",
+    "eruda": "^2.3.3",
+    "peerjs-esnext": "^1.4.1",
     "prop-types": "^15.7.2",
     "raf": "^3.4.1",
     "react": "^16.13.1",
     "react-app-polyfill": "^1.1.0-next.80",
+    "react-countdown": "^2.2.1",
+    "react-deck-swiper": "^1.0.9",
     "react-dom": "^16.13.1",
     "react-is": "^16.13.1",
     "react-scripts": "^3.4.1",
@@ -120,7 +124,7 @@
   "browserslist": {
     "production": [
       "android >= 4.4",
-      "chrome >= 27",
+      "chrome >= 26",
       "iOS >= 9",
       "not ie <= 11",
       "not ie_mob <= 11",

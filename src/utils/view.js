@@ -46,11 +46,11 @@ export default function initView() {
       status_bar_style: 'light'
     };
 
-    // Plaform bug: flash WebView and throw error
     const ANDROID_VIEW = {
       ...BASE_VIEW,
       action_bar_color: '#fff',
-      navigation_bar_color: '#fff'
+      // Plaform bug: flash WebView and throw error
+      // navigation_bar_color: '#fff'
     };
 
     const TRANSPARENT_ANDROID_VIEW = {

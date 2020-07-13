@@ -2,7 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { View } from '@vkontakte/vkui';
+
 import Main from '../panels/Main';
+import Alias from '../panels/Alias';
+import Stickers from '../panels/Stickers';
+import Croco from '../panels/Croco';
 
 import PopoutProvider from '../components/overlay/PopoutProvider';
 import ModalProvider from '../components/overlay/ModalProvider';
@@ -14,15 +18,30 @@ const Home = ({ id }) => {
 
   return (
     <View
+      id={id}
       activePanel={panels.activePanel}
       history={panels.history}
       onSwipeBack={panels.goBack}
-      id={id}
       modal={<ModalProvider />}
       popout={<PopoutProvider />}
       header={false}
     >
-      <Main id="main" callback={panels.goForward} />
+      <Main
+        id="main"
+        goForward={panels.goForward}
+      />
+      <Alias
+        id="alias"
+        goBack={panels.goBack}
+      />
+      <Stickers
+        id="stickers"
+        goBack={panels.goBack}
+      />
+      <Croco
+        id="croco"
+        goBack={panels.goBack}
+      />
     </View>
   );
 };

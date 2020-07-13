@@ -31,8 +31,6 @@ const RichPanelHeader = styled.div`
 
   .PanelHeader__content {
     color: #fff;
-    font-weight: 900;
-    letter-spacing: 0.04em;
   }
 `;
 
@@ -68,7 +66,11 @@ const RichPanelContent = styled.div`
 
 const RichPanel = (props) => {
   return (
-    <RichPanelUnified as={Panel} separator={false}>
+    <RichPanelUnified
+      id={props.id}
+      as={Panel}
+      separator={false}
+    >
       <RichPanelHeader as={PanelHeaderSimple} separator={false}>
         {props.title}
       </RichPanelHeader>
@@ -86,6 +88,7 @@ const RichPanel = (props) => {
 };
 
 RichPanel.propTypes = {
+  id: PropTypes.string.isRequired,
   title: PropTypes.node.isRequired,
   children: PropTypes.node.isRequired,
   affix: PropTypes.node.isRequired,
