@@ -3,21 +3,14 @@ import PropTypes from 'prop-types';
 
 import GradientPanel from '../../../components/panel/GradientPanel';
 
-import { useImmutableCallback } from '../../../hooks/base';
-
-const AliasJoin = ({ id, goBack, goForward }) => {
-  const openSettings = useImmutableCallback(() => {
-    goForward('settings');
-  });
-
+const AliasJoin = ({ id, goBack }) => {
   return (
     <GradientPanel
       id={id}
-      onClose={goBack}
-      title="Команды"
+      onBack={goBack}
+      title="Лобби"
       color="yellow"
     >
-      <button onClick={openSettings}>Далее</button>
     </GradientPanel>
   );
 };

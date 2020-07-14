@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { View } from '@vkontakte/vkui';
-
+import AliasView from '../components/AliasView';
+import AliasTeams from '../panels/AliasTeams';
 import AliasJoin from '../panels/AliasJoin';
 import AliasSettings from '../panels/AliasSettings';
 
@@ -20,7 +20,7 @@ const AliasPrepare = ({ id }) => {
     store.game = {};
   });
 
-  const panels = useHistory('join');
+  const panels = useHistory('settings');
 
   const bus = useBus();
 
@@ -33,7 +33,7 @@ const AliasPrepare = ({ id }) => {
   });
 
   return (
-    <View
+    <AliasView
       id={id}
       activePanel={panels.activePanel}
       history={panels.history}
@@ -42,9 +42,10 @@ const AliasPrepare = ({ id }) => {
       popout={<PopoutProvider />}
       header={false}
     >
-      <AliasJoin id="join" goBack={close} goForward={panels.goForward} />
-      <AliasSettings id="settings" goBack={panels.goBack} goForward={start} />
-    </View>
+      <AliasSettings id="settings" goBack={close} goForward={panels.goForward} />
+      <AliasTeams id="teams" goBack={panels.goBack} goForward={panels.goForward} />
+      <AliasJoin id="join" goBack={panels.goBack} goForward={start} />
+    </AliasView>
   );
 };
 

@@ -1,7 +1,8 @@
 import {
   useState,
   useRef,
-  useEffect
+  useEffect,
+  useMemo as useDeepMemo
 } from 'react';
 import {
   useCreation as useMemo,
@@ -10,7 +11,8 @@ import {
   useUnmount,
   useUpdate as useForceUpdate,
   useUpdateEffect as useUpdate,
-  useSetState as useHavyState
+  useSetState as useHavyState,
+  useDebounceFn
 } from 'ahooks';
 
 function useCallback(callback, deps) {
@@ -33,11 +35,19 @@ function useCompute(factory) {
   return factory();
 }
 
+function useLazyState(initialState) {
+  const [state, setState] = useState(initialState);
+  const setLazyState = useDebounceFn(setState, { wait: 500 });
+  return [state, setLazyState];
+}
+
 export {
   useRef,
   useState,
+  useLazyState,
   useHavyState,
   useMemo,
+  useDeepMemo,
   useCompute,
   useCallback,
   useImmutableCallback,

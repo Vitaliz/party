@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { View } from '@vkontakte/vkui';
-
+import AliasView from '../components/AliasView';
 import AliasPlay from '../panels/AliasPlay';
 
 import PopoutProvider from '../../../components/overlay/PopoutProvider';
@@ -14,7 +13,7 @@ const AliasGame = ({ id }) => {
   const panels = useHistory('play');
 
   return (
-    <View
+    <AliasView
       id={id}
       activePanel={panels.activePanel}
       history={panels.history}
@@ -24,7 +23,7 @@ const AliasGame = ({ id }) => {
       header={false}
     >
       <AliasPlay id="play" />
-    </View>
+    </AliasView>
   );
 };
 

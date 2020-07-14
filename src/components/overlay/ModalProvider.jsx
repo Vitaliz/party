@@ -8,14 +8,14 @@ import { useRouter } from '../../hooks/router';
 import { useModal } from '../../hooks/overlay';
 import { useBus } from '../../hooks/util';
 
-const ModalConsumer = withModalRootContext(({ by, updateModalHeight }) => {
+const ModalConsumer = withModalRootContext((props) => {
   const modal = useModal();
 
   useEffect(() => {
     window.requestAnimationFrame(() => {
-      updateModalHeight();
+      props.updateModalHeight();
     });
-  }, [by]);
+  }, [props.by]);
 
   return (<>{modal.current}</>);
 });

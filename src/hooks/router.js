@@ -75,10 +75,17 @@ function useHistory(initialActivePanel) {
   });
 
   const followBack = useImmutableCallback((name) => {
-    if (name === 'modal' || name === 'popout' || name === null) {
+    if (!name) {
       return;
     }
-    back();
+
+    switch (name) {
+      case 'modal':
+      case 'popout':
+        return;
+      default:
+        back();
+    }
   });
 
   useMount(() => {
