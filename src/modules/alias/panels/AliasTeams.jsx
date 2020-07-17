@@ -2,21 +2,31 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import GradientPanel from '../../../components/panel/GradientPanel';
-import Team from '../components/Team';
+import ThemedButton from '../../../components/common/ThemedButton';
+import TeamButton from '../components/TeamButton';
 import TeamEditor from '../components/TeamEditor';
-import { Button } from '@vkontakte/vkui';
+import { FormLayout } from '@vkontakte/vkui';
 
-import { useImmutableCallback, useDeepMemo, useState, useMount } from '../../../hooks/base';
-import { useModal } from '../../../hooks/overlay';
+import { useImmutableCallback, useMemo, useState, useMount } from '../../../hooks/base';
+import { usePopout } from '../../../hooks/overlay';
+import { useStore } from '../../../hooks/store';
 
 const AliasTeams = ({ id, goBack, goForward }) => {
-  const modal = useModal();
-  const [teams, setTeams] = useState([]);
+  const store = useStore();
+  const popout = usePopout();
+
+  const [teams, setTeams] = useState(() => store.game.teams || []);
+
+  const openJoin = () => {
+    store.game.teams = teams;
+
+    goForward('join');
+  };
 
   const saveTeam = useImmutableCallback((oldName, newName) => {
     setTeams((teams) => {
       if (oldName === '') {
-        return [...teams, { name: newName, users: [] }];
+        return [...teams, { name: newName }];
       }
 
       return teams.map((team) => {
@@ -37,13 +47,14 @@ const AliasTeams = ({ id, goBack, goForward }) => {
   });
 
   const openEditor = useImmutableCallback((name) => {
-    modal.show(
+    popout.show((context) => (
       <TeamEditor
         edit={name}
+        onClose={context.onClose}
         onSave={saveTeam}
         onRemove={removeTeam}
       />
-    );
+    ));
   });
 
   useMount(() => {
@@ -58,30 +69,21 @@ const AliasTeams = ({ id, goBack, goForward }) => {
     }
   });
 
-  const renderTeams = useDeepMemo(() => {
+  const renderTeams = useMemo(() => {
     if (teams.length === 0) {
       return null;
     }
     return teams.map((team) => {
-      const avatars = team.users.map((user) => {
-        return user.avatar;
-      });
-
       return (
-        <Team
+        <TeamButton
           key={team.name}
-          avatars={avatars}
           onClick={openEditor.bind(null, team.name)}
         >
           {team.name}
-        </Team>
+        </TeamButton>
       );
     });
   }, [teams]);
-
-  const openJoin = useImmutableCallback(() => {
-    goForward('join');
-  });
 
   return (
     <GradientPanel
@@ -90,15 +92,22 @@ const AliasTeams = ({ id, goBack, goForward }) => {
       title="Команды"
       color="yellow"
     >
-      {renderTeams}
-      <Button
-        size="xl"
-        mode="tertiary"
-        onClick={openEditor.bind(null, '')}
+      <FormLayout>
+        {renderTeams}
+        <TeamButton
+          $unelevated={true}
+          onClick={openEditor.bind(null, '')}
+        >
+          &#43; Добавить команду
+        </TeamButton>
+      </FormLayout>
+      <ThemedButton
+        $color="yellow"
+        $overlay={true}
+        onClick={openJoin}
       >
-        &#43; Добавить команду
-      </Button>
-      <button onClick={openJoin}>Далее</button>
+        Далее
+      </ThemedButton>
     </GradientPanel>
   );
 };

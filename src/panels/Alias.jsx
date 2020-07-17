@@ -10,12 +10,16 @@ import { useModal } from '../hooks/overlay';
 import { useImmutableCallback } from '../hooks/base';
 import { useBus } from '../hooks/util';
 
+import { SETTINGS } from '../utils/constants';
+
 const Alias = ({ id, goBack }) => {
   const bus = useBus();
   const modal = useModal();
 
   const openRules = useImmutableCallback(() => {
-    modal.show(<AliasRules />);
+    modal.show(() => (
+      <AliasRules />
+    ));
   });
 
   const prepare = useImmutableCallback(() => {
@@ -25,8 +29,11 @@ const Alias = ({ id, goBack }) => {
   return (
     <HillPanel
       id={id}
-      callback={goBack}
+      goBack={goBack}
+      goForward={prepare}
       title="Алиас"
+      count={SETTINGS.alias.count}
+      time={SETTINGS.alias.time}
       color="yellow"
       affix={(
         <Affix>
@@ -34,9 +41,7 @@ const Alias = ({ id, goBack }) => {
           <RoundButton onClick={openRules}>Правила</RoundButton>
         </Affix>
       )}
-      postfix={(
-        <button onClick={prepare}>начать</button>
-      )}
+      postfix="Начать"
     >
       Алиас — классика настольных игр
       по объяснению слов. Каждый из

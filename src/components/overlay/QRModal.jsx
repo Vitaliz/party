@@ -1,13 +1,18 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/macro';
 
-import { Div, Button } from '@vkontakte/vkui';
+import { Div } from '@vkontakte/vkui';
+import ThemedButton from '../common/ThemedButton';
 
 import qr from '@vkontakte/vk-qr';
 
-import { useCallback } from '../../hooks/base';
+import { useCallback, useMemo } from '../../hooks/base';
 import { shareLink } from '../../utils/share';
+
+const QRColorTheme = {
+  yellow: '#FFA54F'
+};
 
 const QRCode = styled.div`
   width: 256px;
@@ -32,7 +37,8 @@ const QRModal = (props) => {
   const code = useMemo(() => {
     return qr.createQR(props.link, {
       qrSize: 256,
-      isShowLogo: true
+      isShowLogo: true,
+      logoColor: QRColorTheme[props.color]
     });
   }, [props.link]);
 
@@ -46,13 +52,19 @@ const QRModal = (props) => {
       <QRCodeInfo>
         Покажи этот QR-код другу или поделись с ним ссылкой
       </QRCodeInfo>
-      <Button onClick={share}>Поделиться ссылкой</Button>
+      <ThemedButton
+        $color={props.color}
+        onClick={share}
+      >
+        Поделиться ссылкой
+      </ThemedButton>
     </Div>
   );
 };
 
 QRModal.propTypes = {
-  link: PropTypes.string.isRequired
+  link: PropTypes.string.isRequired,
+  color: PropTypes.oneOf(['yellow', 'blue']).isRequired
 };
 
 export default QRModal;

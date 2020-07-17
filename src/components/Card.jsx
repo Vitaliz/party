@@ -14,7 +14,7 @@ const ShadowTheme = {
 };
 
 const BackgroundTheme = {
-  yellow: css`background-image: linear-gradient(158deg, #FFD44D 12%, #FFA24F 80%);`,
+  yellow: css`background-image: linear-gradient(158deg, #FFCC4E 12%, #FFA54F 80%);`,
   blue: css`background-image: linear-gradient(158deg, #46D8F5 12%, #4FBCFA 80%);`,
   green: css`background-image: linear-gradient(158deg, #38EDB1 12%, #28D984 80%);`,
   gray: css`background-image: linear-gradient(158deg, #939393 12%, #616161 80%);`
@@ -99,6 +99,7 @@ const CardInfoBadge = styled.span`
 
   font-size: 16px;
   line-height: 16px;
+  font-weight: 500;
 
   margin-right: 16px;
 

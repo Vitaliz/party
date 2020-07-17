@@ -17,7 +17,7 @@ const Checkbox = styled(NativeCheckbox)`
   .Checkbox__input:checked ~ .Checkbox__container .Checkbox__icon {
     background-color: #fff;
     border-color: #fff;
-    color: #FFA000;
+    color: #FFA54F;
   }
 `;
 

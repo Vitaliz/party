@@ -12,7 +12,7 @@ const Tabs = styled(NativeTabs).attrs(() => ({
   }
 
   .TabsItem--selected {
-    color: #FFA000;
+    color: #FFA54F;
     background: #fff;
   }
 `;

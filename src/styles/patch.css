@@ -29,9 +29,21 @@ img {
   margin-left: 8px;
 }
 
+.Button--sz-xl .Button__content {
+  font-weight: 600;
+}
+
 .Tappable--android .Tappable__waves {
   border-radius: inherit;
   will-change: transform;
+}
+
+.Tappable--ios.Tappable--active:not([disabled]):not(.TabsItem):not(.PanelHeaderButton):not(.Button):not(.PanelHeaderContent__in):not(.ActionSheetItem):not(.Banner__in) {
+  background: rgba(215, 216, 217, 0.4) !important;
+}
+
+.Tappable:not([disabled]) {
+  cursor: pointer;
 }
 
 .Header,
@@ -39,12 +51,12 @@ img {
   user-select: none;
 }
 
-.ModalPage__in {
-  width: 482px;
+.ModalPage .ModalPage__in {
+  padding-top: 16px;
 }
 
-.ModalPage .ModalPage__in {
-  padding-top: 26px;
+.ModalPage .ModalPage__content  {
+  padding-top: 10px;
 }
 
 .ModalRoot__mask {
@@ -103,6 +115,36 @@ img {
   font-weight: 500;
 }
 
-.Tappable--ios.Tappable--active:not([disabled]):not(.TabsItem):not(.PanelHeaderButton):not(.Button):not(.PanelHeaderContent__in):not(.ActionSheetItem):not(.Banner__in) {
-  background: rgba(215, 216, 217, 0.4) !important;
+.Tabs--buttons .Tabs__in {
+  margin: 0 -8px;
+}
+
+.FormLayout--ios .FormLayout__row .FormField,
+.FormLayout--ios .FormLayout__row .Button,
+.FormLayout--ios .FormLayout__row .FormStatus,
+.FormLayout--android .FormLayout__row .FormField,
+.FormLayout--android .FormLayout__row .Button,
+.FormLayout--android .FormLayout__row .FormStatus {
+  margin: 0;
+}
+
+html,
+body,
+.scrollable,
+.ModalPage__content {
+  -webkit-overflow-scrolling: touch;
+  -ms-scroll-chaining: none;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+.scrollable::-webkit-scrollbar,
+.ModalPage__content::-webkit-scrollbar {
+  display: none;
+  height: 0;
+  width: 0;
+  background: transparent;
 }

@@ -30,23 +30,6 @@ span {
   font-weight: 700;
 }
 
-html, body, .scrollable {
-  -webkit-overflow-scrolling: touch;
-  -ms-scroll-chaining: none;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  overscroll-behavior: contain;
-}
-
-html::-webkit-scrollbar,
-body::-webkit-scrollbar,
-.scrollable::-webkit-scrollbar {
-  display: none;
-  height: 0;
-  width: 0;
-  background: transparent;
-}
-
 @import './animations.css';
 @import './offline.css';
 @import './patch.css';

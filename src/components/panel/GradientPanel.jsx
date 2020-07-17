@@ -5,7 +5,7 @@ import styled, { css } from 'styled-components/macro';
 import { Panel, PanelHeaderSimple, PanelHeaderBack, PanelHeaderClose } from '@vkontakte/vkui';
 
 const GradientTheme = {
-  yellow: css`background-image: linear-gradient(170deg, #FFD44D 4%, #FFA44F 96%);`,
+  yellow: css`background-image: linear-gradient(170deg, #FFCC4E 4%, #FFA54F 96%);`,
   blue: css`background-image: linear-gradient(170deg, #39DDFE 4%, #40BCFF 96%);`
 };
 

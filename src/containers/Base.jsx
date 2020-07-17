@@ -87,8 +87,8 @@ const Base = () => {
               bus.emit('modal:close');
               return;
             case 'popout':
+              bus.once('popout:closed', resolve);
               bus.emit('popout:close');
-              resolve();
               return;
             default:
               window.requestAnimationFrame(() => {
@@ -106,7 +106,7 @@ const Base = () => {
       send().then((result) => {
         if (result) {
           return prepare().then(() => {
-            modal.show(errorModal);
+            modal.show(() => errorModal);
           });
         }
       });
@@ -118,8 +118,8 @@ const Base = () => {
   });
 
   useMount(() => {
-    const fetchUser = window.FAKE_FLAG ? () => {
-      return fetch.post('/vkma/me').then((response) => {
+    const fetchUser = () => {
+      return fetch.get('/vkma/me').then((response) => {
         const user = interpretResponse(response);
         user.created = response.status === 200;
 
@@ -129,7 +129,7 @@ const Base = () => {
         };
         bus.emit('app:auth');
       });
-    } : () => Promise.resolve();
+    };
 
     bus.on('app:update', fetchUser);
 

@@ -9,6 +9,8 @@ import Subscribe from '../components/Subscribe';
 
 import { useImmutableCallback } from '../hooks/base';
 
+import { SETTINGS } from '../utils/constants';
+
 const MainTitle = styled.h1`
   font-size: 26px;
   line-height: 32px;
@@ -58,32 +60,32 @@ const Main = ({ id, goForward }) => {
           color="yellow"
           name="Алиас"
           description="Объясняй слова!"
-          count="4+"
-          time="15 мин"
+          count={SETTINGS.alias.count}
+          time={SETTINGS.alias.time}
           callback={openAlias}
         />
         <Card
           color="blue"
           name="Стикерочки"
           description="Угадай, кто ты!"
-          count="2+"
-          time="10 мин"
+          count={SETTINGS.stickers.count}
+          time={SETTINGS.stickers.time}
           callback={openStickers}
         />
         <Card
           color="green"
           name="Крокодил"
           description="Показывай без слов!"
-          count="2+"
-          time="10 мин"
+          count={SETTINGS.croco.count}
+          time={SETTINGS.croco.time}
           callback={openCroco}
         />
         <Card
           color="gray"
           name="Мафия"
           description="Очисти город от мафии!"
-          count="4+"
-          time="15 мин"
+          count={SETTINGS.mafia.count}
+          time={SETTINGS.mafia.time}
           callback={openMafia}
         />
       </MainHorizontalScroll>

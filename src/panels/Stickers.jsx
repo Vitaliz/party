@@ -9,11 +9,15 @@ import StickersRules from '../components/rules/StickersRules';
 import { useModal } from '../hooks/overlay';
 import { useImmutableCallback } from '../hooks/base';
 
+import { SETTINGS } from '../utils/constants';
+
 const Stickers = ({ id, goBack }) => {
   const modal = useModal();
 
   const openRules = useImmutableCallback(() => {
-    modal.show(<StickersRules />);
+    modal.show(() => (
+      <StickersRules />
+    ));
   });
 
   return (
@@ -21,6 +25,8 @@ const Stickers = ({ id, goBack }) => {
       id={id}
       callback={goBack}
       title="Стикерочки"
+      count={SETTINGS.stickers.count}
+      time={SETTINGS.stickers.time}
       color="blue"
       affix={(
         <Affix>

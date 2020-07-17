@@ -1,45 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { ActionSheet, ActionSheetItem, usePlatform, IOS } from '@vkontakte/vkui';
-
-import { useState, useCallback, useEffect, useMemo } from '../../hooks/base';
+import { useState, useEffect, useLayoutEffect, useMemo, useRef, useImmutableCallback } from '../../hooks/base';
 import { usePopout } from '../../hooks/overlay';
 import { useRouter } from '../../hooks/router';
 import { useBus } from '../../hooks/util';
 
 const PopoutConsumer = ({ by, onClose }) => {
-  const platform = usePlatform();
   const popout = usePopout();
 
   const content = useMemo(() => {
-    if (popout.current && popout.current.length) {
-      return popout.current.map((item, i) => {
-        return (
-          <ActionSheetItem
-            key={i}
-            autoclose={true}
-            before={item.icon}
-            onClick={item.onClick}
-          >{item.label}</ActionSheetItem>
-        );
-      });
-    } else {
-      return [];
+    if (typeof popout.current === 'function') {
+      return popout.current({ onClose });
     }
+    return null;
   }, [by]);
 
-  return popout.current ? (
-    <ActionSheet onClose={onClose}>
-      {content}
-      {platform === IOS && (
-        <ActionSheetItem
-          autoclose={true}
-          mode="cancel"
-        >Отменить</ActionSheetItem>
-      )}
-    </ActionSheet>
-  ) : null;
+  return (
+    <>{content}</>
+  );
 };
 
 PopoutConsumer.propTypes = {
@@ -53,16 +32,17 @@ const PopoutProvider = () => {
 
   const [updateCounter, setUpdateCounter] = useState(0);
   const [showed, setShowedState] = useState(false);
+  const mountedRef = useRef();
 
-  const closeByRouter = useCallback((name) => {
+  const closeByRouter = useImmutableCallback((name) => {
     if (name === 'popout') {
       window.requestAnimationFrame(() => {
         setShowedState(false);
       });
     }
-  }, []);
+  });
 
-  const show = useCallback(() => {
+  const open = useImmutableCallback(() => {
     window.requestAnimationFrame(() => {
       setShowedState(true);
 
@@ -71,9 +51,9 @@ const PopoutProvider = () => {
         router.push('popout');
       }
     });
-  }, []);
+  });
 
-  const close = useCallback(() => {
+  const close = useImmutableCallback(() => {
     window.requestAnimationFrame(() => {
       setShowedState(false);
 
@@ -82,28 +62,48 @@ const PopoutProvider = () => {
         router.back();
       }
     });
-  }, []);
+  });
 
-  useEffect(() => {
-    const update = () => {
-      window.requestAnimationFrame(() => {
-        setUpdateCounter(updateCounter + 1);
-      });
-    };
+  useLayoutEffect(() => {
+    if (mountedRef.current) {
+      if (showed) {
+        window.requestAnimationFrame(() => {
+          if (mountedRef.current) {
+            bus.emit('popout:opened');
+          }
+        });
+      } else {
+        window.requestAnimationFrame(() => {
+          if (mountedRef.current) {
+            bus.emit('popout:closed');
+          }
+        });
+      }
+    }
+  }, [showed]);
 
-    bus.on('popout:update', update);
-
-    return () => {
-      bus.detach('popout:update', update);
-    };
+  useLayoutEffect(() => {
+    if (mountedRef.current) {
+      bus.emit('popout:updated');
+    }
   }, [updateCounter]);
 
   useEffect(() => {
-    bus.on('popout:show', show);
+    mountedRef.current = true;
+
+    const update = () => {
+      setUpdateCounter((counter) => counter + 1);
+    };
+
+    bus.on('popout:update', update);
+    bus.on('popout:open', open);
     bus.on('popout:close', close);
 
     return () => {
-      bus.detach('popout:show', show);
+      mountedRef.current = false;
+
+      bus.detach('popout:update', update);
+      bus.detach('popout:open', open);
       bus.detach('popout:close', close);
     };
   }, []);

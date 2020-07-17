@@ -3,10 +3,13 @@ import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components/macro';
 
 import { Panel, PanelHeaderSimple, PanelHeaderBack } from '@vkontakte/vkui';
+import ThemedButton from '../common/ThemedButton';
 import { ReactComponent as HillFigure } from '../../assets/hill.svg';
+import IconUsers from '@vkontakte/icons/dist/36/users_3_outline';
+import IconTime from '@vkontakte/icons/dist/28/recent_outline';
 
 const HillTheme = {
-  yellow: css`background-image: linear-gradient(100deg, #FFD44D 30%, #FFA24F 80%);`,
+  yellow: css`background-image: linear-gradient(100deg, #FFCC4E 30%, #FFA54F 80%);`,
   blue: css`background-image: linear-gradient(100deg, #39DDFE 60%, #40BCFF 80%);`,
   green: css`background-image: linear-gradient(100deg, #38EDB1 40%, #28D984 80%);`
 };
@@ -33,7 +36,7 @@ const HillPanelContainer = styled.div`
 
 const HillPanelContent = styled.div`
   width: 100%;
-  max-width: 450px;
+  max-width: 432px;
   margin: 0 auto;
   box-sizing: border-box;
 
@@ -71,7 +74,7 @@ const HillPanelAffix = styled.h1`
   line-height: 32px;
 
   width: 100%;
-  max-width: 450px;
+  max-width: 432px;
   margin: 0 auto;
   box-sizing: border-box;
 
@@ -86,7 +89,7 @@ const HillPanelPostfix = styled.div`
   background-color: #fff;
 
   width: 100%;
-  max-width: 450px;
+  max-width: 432px;
   margin: 0 auto;
   box-sizing: border-box;
 
@@ -180,6 +183,15 @@ const Hill = styled.svg`
   }
 `;
 
+const HillPanelRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-content: stretch;
+  align-items: stretch;
+`;
+
 const HillPanel = (props) => {
   return (
     <HillPanelUnified
@@ -190,7 +202,7 @@ const HillPanel = (props) => {
       <HillPanelHeader
         as={PanelHeaderSimple}
         left={(
-          <PanelHeaderBack onClick={props.callback} />
+          <PanelHeaderBack onClick={props.goBack} />
         )}
         separator={false}
       >
@@ -207,7 +219,30 @@ const HillPanel = (props) => {
         </HillPanelContent>
       </HillPanelContainer>
       <HillPanelPostfix>
-        {props.postfix}
+        <HillPanelRow>
+          <ThemedButton
+            $color={props.color}
+            stretched={true}
+            disabled={true}
+          >
+            {props.count}
+            <IconUsers width={24} height={24} />
+          </ThemedButton>
+          <ThemedButton
+            $color={props.color}
+            stretched={true}
+            disabled={true}
+          >
+            {props.time}
+            <IconTime width={24} height={24} />
+          </ThemedButton>
+        </HillPanelRow>
+        <ThemedButton
+          $color={props.color}
+          onClick={props.goForward}
+        >
+          {props.postfix}
+        </ThemedButton>
       </HillPanelPostfix>
     </HillPanelUnified>
   );
@@ -220,7 +255,10 @@ HillPanel.propTypes = {
   postfix: PropTypes.node.isRequired,
   children: PropTypes.node.isRequired,
   color: PropTypes.oneOf(['yellow', 'blue', 'green']).isRequired,
-  callback: PropTypes.func.isRequired
+  goForward: PropTypes.func.isRequired,
+  goBack: PropTypes.func.isRequired,
+  count: PropTypes.node.isRequired,
+  time: PropTypes.node.isRequired
 };
 
 export default HillPanel;

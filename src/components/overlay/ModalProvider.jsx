@@ -3,21 +3,28 @@ import PropTypes from 'prop-types';
 
 import { ModalRoot, ModalPage, ModalPageHeader, withModalRootContext } from '@vkontakte/vkui';
 
-import { useState, useCallback, useEffect, useRef } from '../../hooks/base';
+import { useState, useImmutableCallback, useEffect, useLayoutEffect, useRef, useMemo } from '../../hooks/base';
 import { useRouter } from '../../hooks/router';
 import { useModal } from '../../hooks/overlay';
 import { useBus } from '../../hooks/util';
 
-const ModalConsumer = withModalRootContext((props) => {
+const ModalConsumer = withModalRootContext(({ by, onClose, updateModalHeight }) => {
   const modal = useModal();
 
   useEffect(() => {
     window.requestAnimationFrame(() => {
-      props.updateModalHeight();
+      updateModalHeight();
     });
-  }, [props.by]);
+  }, [by]);
 
-  return (<>{modal.current}</>);
+  const content = useMemo(() => {
+    if (typeof modal.current === 'function') {
+      return modal.current({ onClose });
+    }
+    return null;
+  }, [by]);
+
+  return (<>{content}</>);
 });
 
 ModalConsumer.propTypes = {
@@ -33,15 +40,15 @@ const ModalProvider = () => {
   const [activeModal, setActiveModal] = useState(null);
   const mountedRef = useRef();
 
-  const closeByRouter = useCallback((name) => {
+  const closeByRouter = useImmutableCallback((name) => {
     if (name === 'modal') {
       window.requestAnimationFrame(() => {
         setActiveModal(null);
       });
     }
-  }, []);
+  });
 
-  const open = useCallback(() => {
+  const open = useImmutableCallback(() => {
     window.requestAnimationFrame(() => {
       setActiveModal('modal');
 
@@ -50,9 +57,9 @@ const ModalProvider = () => {
         router.push('modal');
       }
     });
-  }, []);
+  });
 
-  const close = useCallback(() => {
+  const close = useImmutableCallback(() => {
     window.requestAnimationFrame(() => {
       setActiveModal(null);
 
@@ -61,51 +68,47 @@ const ModalProvider = () => {
         router.back();
       }
     });
-  }, []);
+  });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (mountedRef.current) {
       if (activeModal) {
         window.requestAnimationFrame(() => {
-          bus.emit('modal:opened');
+          if (mountedRef.current) {
+            bus.emit('modal:opened');
+          }
         });
       } else {
         window.requestAnimationFrame(() => {
-          bus.emit('modal:closed');
+          if (mountedRef.current) {
+            bus.emit('modal:closed');
+          }
         });
       }
     }
   }, [activeModal]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (mountedRef.current) {
       bus.emit('modal:updated');
     }
   }, [updateCounter]);
 
   useEffect(() => {
+    mountedRef.current = true;
+
     const update = () => {
-      window.requestAnimationFrame(() => {
-        setUpdateCounter(updateCounter + 1);
-      });
+      setUpdateCounter((counter) => counter + 1);
     };
 
     bus.on('modal:update', update);
-
-    return () => {
-      bus.detach('modal:update', update);
-    };
-  }, [updateCounter]);
-
-  useEffect(() => {
-    mountedRef.current = true;
-
     bus.on('modal:open', open);
     bus.on('modal:close', close);
 
     return () => {
       mountedRef.current = false;
 
+      bus.detach('modal:update', update);
       bus.detach('modal:open', open);
       bus.detach('modal:close', close);
     };
@@ -118,7 +121,7 @@ const ModalProvider = () => {
         onClose={close}
         header={<ModalPageHeader left={null} right={null} />}
       >
-        <ModalConsumer by={updateCounter} />
+        <ModalConsumer by={updateCounter} onClose={close} />
       </ModalPage>
     </ModalRoot>
   );

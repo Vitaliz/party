@@ -19,7 +19,23 @@ const App = () => {
   const [view, setView] = useState('home');
 
   useMount(() => {
-    const test = /join-([0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})$/i;
+    bus.on('app:view', (view) => {
+      setView(view);
+    });
+
+    bus.on('app:code', (code) => {
+      const params = code.split('-');
+      const isHasSalt = params[3];
+      const isNotExpired = (Date.now() - +params[2]) < 4E6;
+      if (isHasSalt && isNotExpired) {
+        store.game.creator = +params[1];
+        setView(`${params[0]}-game`);
+      }
+    });
+  });
+
+  useMount(() => {
+    const test = /([a-z]+-[0-9]+-[0-9]+-\w+)/i;
     const checkCodeOrFetch = (location, shouldShowError) => {
       // uuid v4
       const hash = test.exec(location);
@@ -38,7 +54,7 @@ const App = () => {
           bus.emit('app:code', hash[1]);
         };
 
-        if (store.user.id) {
+        if (store.user.vkUserId) {
           code();
         } else {
           bus.once('app:auth', code);
@@ -73,12 +89,6 @@ const App = () => {
     });
 
     checkCodeOrFetch(window.location.hash);
-  });
-
-  useMount(() => {
-    bus.on('app:view', (view) => {
-      setView(view);
-    });
   });
 
   return (

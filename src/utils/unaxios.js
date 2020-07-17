@@ -1,12 +1,8 @@
-import { parseQuery } from '../utils/uri';
-import { getUTCOffset } from '../utils/date';
+import { baseParams } from '../utils/uri';
 
 import { URL_API } from '../utils/constants';
 
-const VKParams = window.btoa(JSON.stringify({
-  ...parseQuery(window.location.search),
-  utc_offset: getUTCOffset()
-}));
+const VKParams = baseParams(window.location.search);
 
 const isAbsoluteURL = (url) => {
   return /^([a-z][a-z\d+\-.]*:)?\/\//i.test(url);
@@ -62,6 +58,7 @@ unaxios.defaults = {
   baseURL: URL_API,
   headers: {
     'Accept': 'application/json',
+    'Content-Type': 'application/json',
     'Vk-Params': VKParams
   }
 };

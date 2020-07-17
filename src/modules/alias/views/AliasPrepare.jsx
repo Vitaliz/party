@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 
 import AliasView from '../components/AliasView';
 import AliasTeams from '../panels/AliasTeams';
-import AliasJoin from '../panels/AliasJoin';
 import AliasSettings from '../panels/AliasSettings';
 
 import PopoutProvider from '../../../components/overlay/PopoutProvider';
@@ -43,8 +42,7 @@ const AliasPrepare = ({ id }) => {
       header={false}
     >
       <AliasSettings id="settings" goBack={close} goForward={panels.goForward} />
-      <AliasTeams id="teams" goBack={panels.goBack} goForward={panels.goForward} />
-      <AliasJoin id="join" goBack={panels.goBack} goForward={start} />
+      <AliasTeams id="teams" goBack={panels.goBack} goForward={start} />
     </AliasView>
   );
 };

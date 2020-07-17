@@ -2,7 +2,9 @@ import {
   useState,
   useRef,
   useEffect,
-  useMemo as useDeepMemo
+  useLayoutEffect,
+  useMemo as useDeepMemo,
+  useContext
 } from 'react';
 import {
   useCreation as useMemo,
@@ -55,6 +57,8 @@ export {
   useMount,
   useUnmount,
   useUpdate,
+  useLayoutEffect,
   useEffect,
-  useForceUpdate
+  useForceUpdate,
+  useContext
 };

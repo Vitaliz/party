@@ -2,69 +2,81 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/macro';
 
-import { Input, Group, Header, SimpleCell as Cell, Div, Button } from '@vkontakte/vkui';
-import { useRef } from '../../../hooks/base';
-import { useRouter } from '../../../hooks/router';
+import { Input } from '@vkontakte/vkui';
+import PopoutCard from '../../../components/overlay/PopoutCard';
 
-const Row = styled(Div)`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
+import { useRef, useCompute } from '../../../hooks/base';
+
+const TeamEditorCard = styled(PopoutCard)`
+  .Button--lvl-secondary {
+    color: #FFA000;
+  }
+
+  .Button--lvl-primary {
+    background-color: #FFA000;
+  }
+
+  .FormField.Input .Input__el:focus ~ .FormField__border {
+    border-color: #FFA000;
+  }
 `;
 
-const TeamEditor = (props) => {
-  const router = useRouter();
-  const edit = useRef(props.edit);
+const TeamEditor = ({ onClose, onSave, onRemove, edit }) => {
+  const value = useRef(edit);
 
-  const onSave = () => {
-    if (!edit) {
-      props.onRemove(props.edit);
-    } else {
-      props.onSave(props.edit, edit.current);
-    }
-    router.back();
-  };
+  const actions = useCompute(() => {
+    const onClickRemove = () => {
+      onRemove(edit);
+    };
 
-  const onRemove = () => {
-    props.onRemove(props.edit);
-    router.back();
-  };
+    const onClickSave = () => {
+      if (!value.current) {
+        onRemove(edit);
+      } else {
+        onSave(edit, value.current);
+      }
+    };
+
+    const removeActionTitle = edit ?
+      'Удалить' : 'Отмена';
+
+    return [{
+      title: removeActionTitle,
+      mode: 'secondary',
+      action: onClickRemove,
+      autoclose: true
+    }, {
+      title: 'Сохранить',
+      mode: 'primary',
+      action: onClickSave,
+      autoclose: true
+    }];
+  });
+
+  const layout = useCompute(() => {
+    return window.matchMedia && window.matchMedia('(min-width: 360px)').matches ?
+      'horizontal' : 'vertical';
+  });
 
   const onChange = (e) => {
-    edit.current = e.target.value;
+    value.current = e.target.value;
   };
 
   return (
-    <Group header={<Header mode="secondary">Название команды</Header>}>
-      <Cell disabled={true}>
-        <Input type="text" defaultValue={props.edit} onChange={onChange} />
-      </Cell>
-      <Row>
-        <Button
-          size="xl"
-          stretched={true}
-          mode="destructive"
-          onClick={onRemove}
-        >
-          Удалить
-        </Button>
-        <Button
-          size="xl"
-          align="right"
-          after="ic"
-          stretched={true}
-          mode="primary"
-          onClick={onSave}
-        >
-          Сохранить
-        </Button>
-      </Row>
-    </Group>
+    <TeamEditorCard
+      actionsLayout={layout}
+      actions={actions}
+      header="Название команды"
+      onClose={onClose}
+    >
+      <Input type="text" defaultValue={edit} onChange={onChange} />
+    </TeamEditorCard>
   );
 };
 
 TeamEditor.propTypes = {
   edit: PropTypes.string,
+  onClose: PropTypes.func.isRequired,
   onSave: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired
 };
