@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/macro';
 
-import { Panel, PanelHeaderSimple } from '@vkontakte/vkui';
+import { Panel, PanelHeaderSimple, Div } from '@vkontakte/vkui';
 
 const RichPanelUnified = styled.div`
   &:after {
@@ -34,7 +34,7 @@ const RichPanelHeader = styled.div`
   }
 `;
 
-const RichPanelFill = styled.div`
+const RichPanelFill = styled(Div)`
   flex-grow: 1;
   flex-shrink: 1;
   min-height: 0;
@@ -45,8 +45,6 @@ const RichPanelFill = styled.div`
   flex-wrap: nowrap;
   align-content: stretch;
   align-items: stretch;
-
-  padding: 16px;
 `;
 
 const RichPanelAffix = styled(RichPanelFill)`
@@ -57,11 +55,9 @@ const RichPanelPostFix = styled(RichPanelFill)`
   justify-content: flex-start;
 `;
 
-const RichPanelContent = styled.div`
+const RichPanelContent = styled(Div)`
   flex-grow: 0;
   flex-shrink: 0;
-
-  padding: 0 16px;
 `;
 
 const RichPanel = (props) => {

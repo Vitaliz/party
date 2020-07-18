@@ -71,6 +71,15 @@ const AliasSettings = ({ id, goBack, goForward }) => {
       onClose={goBack}
       title="Настройки"
       color="yellow"
+      postfix={(
+        <ThemedButton
+          $color="yellow"
+          $overlay={true}
+          onClick={openTeams}
+        >
+          Далее
+        </ThemedButton>
+      )}
     >
       <Group
         header={<Header>Длительность раунда</Header>}
@@ -89,13 +98,6 @@ const AliasSettings = ({ id, goBack, goForward }) => {
         </Tabs>
       </Group>
       <Checkbox>Каждое пропущенное слово отнимает очки</Checkbox>
-      <ThemedButton
-        $color="yellow"
-        $overlay={true}
-        onClick={openTeams}
-      >
-        Далее
-      </ThemedButton>
     </GradientPanel>
   );
 };

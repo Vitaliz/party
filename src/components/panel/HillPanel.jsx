@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components/macro';
 
-import { Panel, PanelHeaderSimple, PanelHeaderBack } from '@vkontakte/vkui';
+import { Panel, PanelHeaderSimple, PanelHeaderBack, Div } from '@vkontakte/vkui';
 import ThemedButton from '../common/ThemedButton';
 import { ReactComponent as HillFigure } from '../../assets/hill.svg';
 import IconUsers from '@vkontakte/icons/dist/36/users_3_outline';
@@ -34,7 +34,7 @@ const HillPanelContainer = styled.div`
   }
 `;
 
-const HillPanelContent = styled.div`
+const HillPanelContent = styled(Div)`
   width: 100%;
   max-width: 432px;
   margin: 0 auto;
@@ -42,7 +42,8 @@ const HillPanelContent = styled.div`
 
   position: relative;
   top: -64px;
-  padding: 0 16px;
+  padding-top: 0;
+  padding-bottom: 0;
 
   font-size: 16px;
   line-height: 26px;
@@ -63,7 +64,7 @@ const HillPanelContent = styled.div`
   }
 `;
 
-const HillPanelAffix = styled.h1`
+const HillPanelAffix = styled(Div)`
   position: relative;
   z-index: 9;
 
@@ -78,14 +79,16 @@ const HillPanelAffix = styled.h1`
   margin: 0 auto;
   box-sizing: border-box;
 
-  padding: 20px 16px;
+  padding-top: 20px;
+  padding-bottom: 20px;
 
   @media (min-width: 482px) {
-    padding: 20px 0;
+    padding-left: 0;
+    padding-right: 0;
   }
 `;
 
-const HillPanelPostfix = styled.div`
+const HillPanelPostfix = styled(Div)`
   background-color: #fff;
 
   width: 100%;
@@ -93,10 +96,9 @@ const HillPanelPostfix = styled.div`
   margin: 0 auto;
   box-sizing: border-box;
 
-  padding: 20px 16px;
-
   @media (min-width: 482px) {
-    padding: 20px 0;
+    padding-left: 0;
+    padding-right: 0;
   }
 `;
 
@@ -190,6 +192,8 @@ const HillPanelRow = styled.div`
   justify-content: flex-start;
   align-content: stretch;
   align-items: stretch;
+
+  margin-bottom: 12px;
 `;
 
 const HillPanel = (props) => {
@@ -222,16 +226,16 @@ const HillPanel = (props) => {
         <HillPanelRow>
           <ThemedButton
             $color={props.color}
+            $badge={true}
             stretched={true}
-            disabled={true}
           >
             {props.count}
             <IconUsers width={24} height={24} />
           </ThemedButton>
           <ThemedButton
             $color={props.color}
+            $badge={true}
             stretched={true}
-            disabled={true}
           >
             {props.time}
             <IconTime width={24} height={24} />

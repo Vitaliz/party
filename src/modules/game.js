@@ -45,6 +45,7 @@ export default class Game {
     // wait open state
     this.peer.on('open', () => {
       this.peer.on('connection', this.handleConnection.bind(this));
+      this._bus.emit('init');
     });
   }
 

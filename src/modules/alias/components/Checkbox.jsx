@@ -19,6 +19,16 @@ const Checkbox = styled(NativeCheckbox)`
     border-color: #fff;
     color: #FFA54F;
   }
+
+  @media (min-width: 432px) {
+    &.Checkbox--ios {
+      border-radius: 10px;
+    }
+
+    &.Checkbox--android {
+      border-radius: 8px;
+    }
+  }
 `;
 
 export default Checkbox;

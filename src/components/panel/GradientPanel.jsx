@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled, { css } from 'styled-components/macro';
 
-import { Panel, PanelHeaderSimple, PanelHeaderBack, PanelHeaderClose } from '@vkontakte/vkui';
+import { Panel, PanelHeaderSimple, PanelHeaderBack, PanelHeaderClose, Div } from '@vkontakte/vkui';
 
 const GradientTheme = {
   yellow: css`background-image: linear-gradient(170deg, #FFCC4E 4%, #FFA54F 96%);`,
@@ -48,13 +48,37 @@ const GradientPanelHeader = styled.div`
   }
 `;
 
-const GradientPanelContent = styled.div`
+const GradientPanelContent = styled(Div)`
   position: relative;
 
-  flex-shrink: 0;
+  flex-shrink: 1;
   flex-grow: 1;
+  min-height: 0;
 
-  padding: 0 16px;
+  width: 100%;
+  max-width: 432px;
+  margin: 0 auto;
+  box-sizing: border-box;
+
+  @media (min-width: 482px) {
+    padding-left: 0;
+    padding-right: 0;
+  }
+`;
+
+const GradientPanelPostfix = styled(Div)`
+  flex-shrink: 0;
+  flex-grow: 0;
+
+  width: 100%;
+  max-width: 432px;
+  margin: 0 auto;
+  box-sizing: border-box;
+
+  @media (min-width: 482px) {
+    padding-left: 0;
+    padding-right: 0;
+  }
 `;
 
 const GradientPanel = (props) => {
@@ -78,6 +102,9 @@ const GradientPanel = (props) => {
       <GradientPanelContent>
         {props.children}
       </GradientPanelContent>
+      <GradientPanelPostfix>
+        {props.postfix}
+      </GradientPanelPostfix>
     </GradientPanelUnified>
   );
 };
@@ -86,6 +113,7 @@ GradientPanel.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.node.isRequired,
   children: PropTypes.node.isRequired,
+  postfix: PropTypes.node.isRequired,
   color: PropTypes.oneOf(['yellow', 'blue']).isRequired,
   onBack: PropTypes.func,
   onClose: PropTypes.func

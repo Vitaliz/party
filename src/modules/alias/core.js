@@ -3,16 +3,21 @@ import Game from '../game';
 export default class Core extends Game {
   constructor(user, settings) {
     super(user);
+
+    if (settings.teams) {
+      settings.teams.forEach((team) => {
+        team.users = [];
+      });
+    } else {
+      this._bus.once('init', this._onInit.bind(this));
+    }
+
     this.settings = settings;
   }
 
   _onInit() {
     if (this.settings.creator) {
       this.connect(this.settings.creator);
-    } else {
-      this.settings.teams.forEach((team) => {
-        team.users = [];
-      });
     }
   }
 

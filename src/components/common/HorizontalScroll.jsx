@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components/macro';
 
+import { usePlatform} from '@vkontakte/vkui';
+
 const HorizontalScrollContainer = styled.div`
   overflow-x: auto;
   max-width: 100%;
@@ -22,15 +24,27 @@ const UnifiedHorizontalScroll = styled.div`
     flex-grow: 0;
     flex-shrink: 0;
     min-width: 0;
+  }
 
-    margin-right: 16px;
+  &.UnifiedHorizontalScroll--ios {
+    & > * {
+      margin-right: 12px;
+    }
+  }
+
+  &.UnifiedHorizontalScroll--android {
+    & > * {
+      margin-right: 16px;
+    }
   }
 `;
 
 const HorizontalScroll = (props) => {
+  const platform = usePlatform();
+
   return (
-    <HorizontalScrollContainer className={`${props.className} scrollable`}>
-      <UnifiedHorizontalScroll>
+    <HorizontalScrollContainer className={`${props.className} HorizontalScroll--${platform} scrollable`}>
+      <UnifiedHorizontalScroll className={`UnifiedHorizontalScroll--${platform}`}>
         {props.children}
       </UnifiedHorizontalScroll>
     </HorizontalScrollContainer>

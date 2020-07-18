@@ -77,15 +77,17 @@ const AliasJoin = ({ game, id, goBack }) => {
       onBack={goBack}
       title="Лобби"
       color="yellow"
+      postfix={(
+        <ThemedButton
+          $color="yellow"
+          $overlay={true}
+          onClick={showQR}
+        >
+          Пригласить
+        </ThemedButton>
+      )}
     >
       {renderTeams}
-      <ThemedButton
-        $color="yellow"
-        $overlay={true}
-        onClick={showQR}
-      >
-        Пригласить
-      </ThemedButton>
     </GradientPanel>
   );
 };

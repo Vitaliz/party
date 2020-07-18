@@ -19,6 +19,8 @@ const TeamCardUnified = styled(Card).attrs(() => ({
 }))`
   background-color: #fff;
   padding: 52px 40px 8px 40px;
+
+  margin-bottom: 12px;
 `;
 
 const TeamCardTitle = styled(Title).attrs(() => ({
@@ -51,6 +53,7 @@ const TeamCardUsers = styled(UsersStack).attrs(() => ({
   layout: 'horizontal',
   size: 's'
 }))`
+  height: 24px;
   padding: 8px 0;
 
   .UsersStack__photos:empty + .UsersStack__text {

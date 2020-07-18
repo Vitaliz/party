@@ -7,24 +7,44 @@ import TeamButton from '../components/TeamButton';
 import TeamEditor from '../components/TeamEditor';
 import { FormLayout } from '@vkontakte/vkui';
 
-import { useImmutableCallback, useMemo, useState, useMount } from '../../../hooks/base';
+import { useImmutableCallback, useMemo, useState, useCompute } from '../../../hooks/base';
 import { usePopout } from '../../../hooks/overlay';
 import { useStore } from '../../../hooks/store';
+
+import { randomElements } from '../../../utils/data';
+import { NAMES } from '../../../utils/constants';
+
+const randomTeams = randomElements(NAMES, 2).map((name) => ({ name }));
 
 const AliasTeams = ({ id, goBack, goForward }) => {
   const store = useStore();
   const popout = usePopout();
 
-  const [teams, setTeams] = useState(() => store.game.teams || []);
+  const [teams, setTeams] = useState(() => store.game.teams || randomTeams);
+
+  const canStart = useCompute(() => {
+    return teams.length >= 2 && teams.length <= 12;
+  });
 
   const openJoin = () => {
-    store.game.teams = teams;
+    if (!canStart) {
+      return;
+    }
 
+    store.game.teams = teams;
     goForward('join');
   };
 
   const saveTeam = useImmutableCallback((oldName, newName) => {
     setTeams((teams) => {
+      const has = teams.some((team) => {
+        return team.name === newName;
+      });
+
+      if (has) {
+        return teams;
+      }
+
       if (oldName === '') {
         return [...teams, { name: newName }];
       }
@@ -57,18 +77,6 @@ const AliasTeams = ({ id, goBack, goForward }) => {
     ));
   });
 
-  useMount(() => {
-    if (teams.length === 0) {
-      window.requestAnimationFrame(() => {
-        window.setTimeout(() => {
-          window.requestAnimationFrame(() => {
-            openEditor('');
-          });
-        }, 600);
-      });
-    }
-  });
-
   const renderTeams = useMemo(() => {
     if (teams.length === 0) {
       return null;
@@ -91,6 +99,16 @@ const AliasTeams = ({ id, goBack, goForward }) => {
       onBack={goBack}
       title="Команды"
       color="yellow"
+      postfix={(
+        <ThemedButton
+          $color="yellow"
+          $overlay={true}
+          disabled={!canStart}
+          onClick={openJoin}
+        >
+          Далее
+        </ThemedButton>
+      )}
     >
       <FormLayout>
         {renderTeams}
@@ -101,13 +119,6 @@ const AliasTeams = ({ id, goBack, goForward }) => {
           &#43; Добавить команду
         </TeamButton>
       </FormLayout>
-      <ThemedButton
-        $color="yellow"
-        $overlay={true}
-        onClick={openJoin}
-      >
-        Далее
-      </ThemedButton>
     </GradientPanel>
   );
 };

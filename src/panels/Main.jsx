@@ -23,8 +23,15 @@ const MainTitle = styled.h1`
 `;
 
 const MainHorizontalScroll = styled(HorizontalScroll)`
-  margin: 0 -16px;
-  padding: 0 16px;
+  &.HorizontalScroll--android {
+    margin: 0 -16px;
+    padding: 0 16px;
+  }
+
+  &.HorizontalScroll--ios {
+    margin: 0 -12px;
+    padding: 0 12px;
+  }
 `;
 
 const MainSubscribe = styled(Subscribe)`

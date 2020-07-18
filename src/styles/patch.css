@@ -21,16 +21,13 @@ img {
   transition: background-color 300ms var(--android-easing);
 }
 
-.Button[disabled] {
-  opacity: 1;
-}
-
 .Button--str + .Button--str {
   margin-left: 8px;
 }
 
 .Button--sz-xl .Button__content {
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .Tappable--android .Tappable__waves {
@@ -126,6 +123,10 @@ img {
 .FormLayout--android .FormLayout__row .Button,
 .FormLayout--android .FormLayout__row .FormStatus {
   margin: 0;
+}
+
+.FormLayout {
+  margin-top: -12px;
 }
 
 html,
