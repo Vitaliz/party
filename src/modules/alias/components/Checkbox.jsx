@@ -20,7 +20,7 @@ const Checkbox = styled(NativeCheckbox)`
     color: #FFA54F;
   }
 
-  @media (min-width: 432px) {
+  @media (min-width: 433px) {
     &.Checkbox--ios {
       border-radius: 10px;
     }

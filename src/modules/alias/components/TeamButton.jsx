@@ -8,6 +8,12 @@ const TeamButton = styled(Button).attrs((props) => ({
 }))`
   width: 100%;
   color: ${(props) => props.$unelevated ? '#fff' : '#FFA54F'};
+  overflow: hidden;
+
+  .Button__content {
+    max-width: 100%;
+    text-overflow: ellipsis;
+  }
 `;
 
 export default TeamButton;

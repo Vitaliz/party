@@ -1,6 +1,6 @@
-import { Peer } from 'peerjs-esnext/dist/peerjs-esnext';
+import { Peer, util } from 'peerjs-esnext/dist/peerjs-esnext';
 import { PEER_HOST, PEER_PATH } from '../utils/constants';
-import { createBus } from '../utils/bus';
+import globalBus, { createBus } from '../utils/bus';
 
 export default class Game {
   constructor(user) {
@@ -72,6 +72,7 @@ export default class Game {
   handleError(err) {
     // TODO: show error or something else
     console.error(err);
+    globalBus.emit('app:error', err);
   }
 
   handleConnection(connection) {
@@ -185,3 +186,4 @@ export default class Game {
     this._bus.detach('update', callback);
   }
 }
+Game.util = util;

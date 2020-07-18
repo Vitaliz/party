@@ -69,7 +69,11 @@ const TeamEditor = ({ onClose, onSave, onRemove, edit }) => {
       header="Название команды"
       onClose={onClose}
     >
-      <Input type="text" defaultValue={edit} onChange={onChange} />
+      <Input
+        type="text"
+        defaultValue={edit}
+        onChange={onChange}
+      />
     </TeamEditorCard>
   );
 };

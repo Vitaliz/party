@@ -114,8 +114,6 @@ const HillPanelGradient = styled.div`
 
   height: 2000px;
   transform: translateY(-1680px);
-  will-change: transform;
-  backface-visibility: hidden;
 
   pointer-events: none;
   touch-action: none;
