@@ -2,17 +2,28 @@ import { Peer, util } from 'peerjs-esnext/dist/peerjs-esnext';
 import { PEER_HOST, PEER_PATH } from '../utils/constants';
 import globalBus, { createBus } from '../utils/bus';
 
-export default class Game {
-  constructor(user) {
-    this._meta = user;
-    this._sync = new Set();
-    this._retry = 0;
-    this._timer = null;
-    this._bus = createBus();
+export const SIGNAL = {
+  HOST_WHO: 1,
+  HOST_IS: 2,
 
-    this.state = {};
+  META_REQUEST: 3,
+  META_RESPONSE: 4
+};
+
+export default class Game {
+  constructor(user, host) {
+    this.id = null;
+
+    this._meta = user;
+    this._retry = 0;
+
+    this.timer = null;
+    this.bus = createBus();
     this.connections = new Map();
     this.meta = new Map();
+    this.sync = new Set();
+
+    this.host = +host;
     this.peer = new Peer(String(user.vkUserId), {
       pingInterval: 1000,
       host: PEER_HOST,
@@ -40,86 +51,28 @@ export default class Game {
         bundlePolicy: 'max-compat'
       }
     });
+
     // react to errors
     this.peer.on('error', this.handleError.bind(this));
     // wait open state
     this.peer.on('open', () => {
       this.peer.on('connection', this.handleConnection.bind(this));
-      this._bus.emit('init');
+
+      this.id = +this.peer.id;
+
+      if (this.host !== this.id) {
+        this.connect(this.host);
+      } else {
+        this._onInit();
+      }
     });
   }
 
-  destroy() {
-    // connections cannot destroy themselves...
-    this.connections.forEach((connection) => {
-      // ...so close each connection gracefully...
-      connection.close();
-    });
-    // ...but peer connection is awful so just destroy
-    this.peer.destroy();
+  _onInit() {
+    this.bus.emit('init');
   }
 
-  setState(state) {
-    if (state) {
-      this.state = {
-        ...this.state,
-        ...state
-      };
-      this._bus.emit('update');
-    }
-  }
-
-  handleError(err) {
-    // TODO: show error or something else
-    console.error(err);
-    globalBus.emit('app:error', err);
-  }
-
-  handleConnection(connection) {
-    this.subscribe(connection);
-  }
-
-  handleData(peerId, data) {
-    switch (data.type) {
-      case 'sync':
-        // sync state
-        this.setState(data.payload);
-        // send success
-        this.broadcast('sync-success', { vkUserId: peerId });
-        break;
-      case 'sync-callback':
-        // check peer
-        if (peerId === data.payload.vkUserId) {
-          // one peer syncronized
-          this._sync.add(peerId);
-
-          // check that all peer synchronized
-          if (this.isSynchronized()) {
-            // reset
-            window.clearTimeout(this._timer);
-            this._retry = 0;
-
-            // emit success
-            this._bus.emit('update');
-          }
-        }
-        break;
-      case 'meta':
-        // check peer
-        if (peerId === data.payload.vkUserId) {
-          this.meta.set(peerId, data.payload);
-          this._bus.emit('update');
-        }
-        break;
-    }
-  }
-
-  connect(peerId) {
-    // connect manually
-    this.handleConnection(this.peer.connect(String(peerId)));
-  }
-
-  subscribe(connection) {
+  subscribe(connection, callback) {
     // react to errors
     connection.on('error', this.handleError.bind(this));
     // wait open state
@@ -136,54 +89,145 @@ export default class Game {
       // save connection
       this.connections.set(+connection.peer, connection);
 
-      // send meta data
-      connection.send({ type: 'meta', payload: this._meta });
+      callback(+connection.peer);
     });
   }
 
-  broadcast(type, payload) {
-    // broadcast
+  handleConnection(connection) {
+    this.subscribe(connection, () => {
+      // TODO
+    });
+  }
+
+  connect(peerId) {
+    // connect manually
+    const connection = this.peer.connect(String(peerId));
+
+    // subscribe
+    this.subscribe(connection, (peerId) => {
+      this.send(peerId, {
+        signal: SIGNAL.HOST_WHO
+      });
+    });
+  }
+
+  handleError(err) {
+    // TODO: show error or something else
+    console.error(err);
+    globalBus.emit('app:error', err);
+  }
+
+  handleData(peerId, data) {
+    switch (data.signal) {
+      case SIGNAL.HOST_WHO:
+        this._signalHostWho(peerId);
+        break;
+      case SIGNAL.HOST_IS:
+        this._signalHostIs(peerId, data);
+        break;
+      case SIGNAL.META_REQUEST:
+        this._signalMetaRequest(peerId);
+        break;
+      case SIGNAL.META_RESPONSE:
+        this._signalMetaResponse(peerId, data);
+        break;
+    }
+  }
+
+  _signalHostWho(peerId) {
+    this.send(peerId, {
+      signal: SIGNAL.HOST_IS,
+      payload: this.host
+    });
+  }
+
+  _signalHostIs(peerId, data) {
+    if (+peerId === +data.payload) {
+      this.host = +peerId;
+
+      this._onInit();
+
+      this.send(this.host, {
+        signal: SIGNAL.META_REQUEST
+      });
+    } else {
+      this.handleConnection(this.peer.connect(String(peerId)));
+    }
+  }
+
+  _signalMetaRequest(peerId) {
+    if (+peerId !== this.host) {
+      this.send(peerId, {
+        signal: SIGNAL.META_REQUEST
+      });
+    }
+
+    this.send(peerId, {
+      signal: SIGNAL.META_RESPONSE,
+      payload: this._meta
+    });
+  }
+
+  _signalMetaResponse(peerId, data) {
+    this.meta.set(+peerId, data);
+  }
+
+  send(peerId, data) {
+    const connection = this.connections.get(+peerId);
+    if (connection) {
+      connection.send(data);
+    }
+  }
+
+  broadcast(data) {
     this.connections.forEach((connection) => {
-      connection.send({ type, payload });
+      connection.send(data);
     });
   }
 
   isSynchronized() {
-    return this._sync.size >= this.connections.size;
-  }
-
-  sync() {
-    // clear old
-    window.clearTimeout(this._timer);
-
-    if (this._retry >= 3) {
-      // TODO: show error or something else
-      return;
-    }
-
-    if (this._retry === 0) {
-      // synchronized peers
-      this._sync.clear();
-    }
-
-    // pending retry
-    this._timer = window.setTimeout(() => {
-      this.sync();
-    }, 5000);
-
-    // new iter
-    ++this._retry;
-
-    // send current state
-    this.broadcast('sync', this.state);
+    return this.sync.size >= this.connections.size;
   }
 
   attach(callback) {
-    this._bus.on('update', callback);
+    if (this.bus) {
+      this.bus.on('update', callback);
+    }
   }
 
   detach(callback) {
-    this._bus.detach('update', callback);
+    if (this.bus) {
+      this.bus.detach('update', callback);
+    }
+  }
+
+  destroy() {
+    // ensure that timer is clear
+    window.clearTimeout(this.timer);
+
+    // firstly, destroy bus
+    this.bus.detachAll();
+    this.bus = null;
+
+    // connections cannot destroy themselves...
+    this.connections.forEach((connection) => {
+      // ...so close each connection gracefully
+      connection.close();
+    });
+
+    // finally clean up
+    this.connections.clear();
+    this.connections = null;
+
+    this.meta.clear();
+    this.meta = null;
+
+    this.sync.clear();
+    this.sync = null;
+
+    // peer connection is awful so just destroy
+    this.peer.destroy();
+    this.peer = null;
   }
 }
 Game.util = util;

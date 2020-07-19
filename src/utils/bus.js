@@ -42,6 +42,10 @@ const createBus = () => {
           callback(e, eventName);
         });
       }
+    },
+    detachAll() {
+      mettEvents.clear();
+      onceEvents.clear();
     }
   };
 
