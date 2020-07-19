@@ -1,15 +1,17 @@
 import React from 'react';
 
-import { ConfigProvider, Root } from '@vkontakte/vkui';
+import {ConfigProvider, Root} from '@vkontakte/vkui';
 
 import Home from '../views/Home';
 
 import AliasGame from '../modules/alias/views/AliasGame';
 import AliasPrepare from '../modules/alias/views/AliasPrepare';
 
-import { useState, useMount } from '../hooks/base';
-import { useBus, useBridge } from '../hooks/util';
-import { useStore } from '../hooks/store';
+import StickersGame from '../modules/stickers/views/StickersGame';
+
+import {useMount, useState} from '../hooks/base';
+import {useBridge, useBus} from '../hooks/util';
+import {useStore} from '../hooks/store';
 
 const App = () => {
   const bus = useBus();
@@ -23,12 +25,13 @@ const App = () => {
       setView(view);
     });
 
-    bus.on('app:code', (code) => {
-      const params = code.split('-');
+    bus.on('app:code', (params) => {
+      // const params = code.split('-');
       const isHasSalt = params[3];
       const isNotExpired = (Date.now() - +params[2]) < 4E6;
       if (isHasSalt && isNotExpired) {
         store.game.creator = +params[1];
+        store.game.id = params[1];
         setView(`${params[0]}-game`);
       }
     });
@@ -36,9 +39,14 @@ const App = () => {
 
   useMount(() => {
     const test = /([a-z]+-[0-9]+-[0-9]+-\w+)/i;
+    const testUuidV4 = /([a-z]+)-([0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12})-(\w+)-(\w+)/i;
     const checkCodeOrFetch = (location, shouldShowError) => {
-      // uuid v4
+      // old
       const hash = test.exec(location);
+
+      // uuid v4
+      const hashV4 = testUuidV4.exec(location);
+
       if (hash && hash[1]) {
         if (bridge.supports('VKWebAppSetLocation')) {
           bridge.send('VKWebAppSetLocation', {
@@ -51,7 +59,37 @@ const App = () => {
         }
 
         const code = () => {
-          bus.emit('app:code', hash[1]);
+
+          const params = hash[1].split('-');
+
+          bus.emit('app:code', params);
+        };
+
+        if (store.user.vkUserId) {
+          code();
+        } else {
+          bus.once('app:auth', code);
+        }
+      } else if (hashV4) {
+        if (bridge.supports('VKWebAppSetLocation')) {
+          bridge.send('VKWebAppSetLocation', {
+            location: ''
+          }).catch(() => {
+            window.location.hash = '';
+          });
+        } else {
+          window.location.hash = '';
+        }
+
+        const params = [
+          hashV4[1],
+          hashV4[2],
+          hashV4[3],
+          hashV4[4],
+        ];
+
+        const code = () => {
+          bus.emit('app:code', params);
         };
 
         if (store.user.vkUserId) {
@@ -94,9 +132,11 @@ const App = () => {
   return (
     <ConfigProvider>
       <Root activeView={view}>
-        <Home id="home" />
-        <AliasPrepare id="alias-prepare" />
-        <AliasGame id="alias-game" />
+        <Home id="home"/>
+        <AliasPrepare id="alias-prepare"/>
+        <AliasGame id="alias-game"/>
+
+        <StickersGame id="stickers-game"/>
       </Root>
     </ConfigProvider>
   );
