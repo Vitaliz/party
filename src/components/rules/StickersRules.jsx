@@ -6,7 +6,7 @@ const StickersRules = () => {
     <Group header={<Header mode="secondary">Правила игры</Header>}>
       <List>
         <Cell multiline={true} disabled={true}>
-          Стикерочки – игра, целью которой является угадывание слова,
+          Стикерочки — игра, целью которой является угадывание слова,
           которое загадывает вам товарищ по игре.
         </Cell>
         <Cell multiline={true} disabled={true}>

@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import Affix from '../components/common/Affix';
 import RoundButton from '../components/common/RoundButton';
 import HillPanel from '../components/panel/HillPanel';
-import MafiaRules from '../components/rules/CrocoRules';
+import MafiaRules from '../components/rules/MafiaRules';
 
 import { useModal } from '../hooks/overlay';
 import { useImmutableCallback } from '../hooks/base';
@@ -42,10 +42,11 @@ const Mafia = ({ id, goBack }) => {
       postfix="Скоро"
       disabled={true}
     >
-      Крокодил – классическая словестная игра,
-      основным правилом которой является
-      показывание слов жестами  или движениями
-      без словестного произношения.
+      Мафия — командная пошаговая психологическая игра
+      с детективным сюжетом, где каждый может оказаться
+      как мирным жителем или комиссаром, представляющим
+      правосудие, так и грозным мафиози, держащим в
+      страхе весь город.
     </HillPanel>
   );
 };

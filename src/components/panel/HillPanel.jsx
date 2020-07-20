@@ -11,7 +11,8 @@ import IconTime from '@vkontakte/icons/dist/28/recent_outline';
 const HillTheme = {
   yellow: css`background-image: linear-gradient(100deg, #FFCC4E 30%, #FFA54F 80%);`,
   blue: css`background-image: linear-gradient(100deg, #39DDFE 60%, #40BCFF 80%);`,
-  green: css`background-image: linear-gradient(100deg, #38EDB1 40%, #28D984 80%);`
+  green: css`background-image: linear-gradient(100deg, #38EDB1 40%, #28D984 80%);`,
+  gray: css`background-image: linear-gradient(100deg, #939393 40%, #616161 80%);`
 };
 
 const HillPanelContainer = styled.div`

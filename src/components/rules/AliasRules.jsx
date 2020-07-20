@@ -6,7 +6,7 @@ const AliasRules = () => {
     <Group header={<Header mode="secondary">Правила игры</Header>}>
       <List>
         <Cell multiline={true} disabled={true}>
-          Алиас – командная игра, целью которой является объяснение слов.
+          Алиас — командная игра, целью которой является объяснение слов.
         </Cell>
         <Cell multiline={true} disabled={true}>
           1&#41; Задачей каждого игрока командыявляется объяснение как можно

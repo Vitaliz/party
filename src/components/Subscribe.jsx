@@ -69,14 +69,14 @@ const SubscribeImage = styled.img`
 const Subscribe = (props) => {
   const bridge = useBridge();
   const store = useStore();
-  const [isFollower, setFollower] = useState(store.user?.is_follower || !bridge.supports('VKWebAppJoinGroup'));
+  const [isFollower, setFollower] = useState(store.user?.isFollower || !bridge.supports('VKWebAppJoinGroup'));
 
   const follow = useImmutableCallback(() => {
     bridge.send('VKWebAppJoinGroup', {
       'group_id': APP_GROUP
     }).then((data) => {
       store.user.is_follower = data && data.result;
-      setFollower(store.user.is_follower);
+      setFollower(store.user.isFollower);
     }).catch(() => {
       setFollower(false);
     });

@@ -3,15 +3,24 @@ import styled, { css } from 'styled-components/macro';
 import { Button } from '@vkontakte/vkui';
 
 const ButtonTheme = {
-  yellow: css`background-color: #FFA54F;`
+  yellow: css`background-color: #FFA54F;`,
+  blue: css`background-color: #40BCFF;`,
+  green: css`background-color: #28D984;`,
+  gray: css`background-color: #616161;`
 };
 
 const ButtonOverlayTheme = {
-  yellow: css`color: #FFA54F;`
+  yellow: css`color: #FFA54F;`,
+  blue: css`color: #40BCFF;`,
+  green: css`color: #28D984;`,
+  gray: css`color: #616161;`
 };
 
 const ButtonDisabledTheme = {
-  yellow: css`${ButtonOverlayTheme.yellow} background-color: rgba(255, 165, 79, 0.2);`
+  yellow: css`${ButtonOverlayTheme.yellow} background-color: rgba(255, 165, 79, 0.2);`,
+  blue: css`${ButtonOverlayTheme.blue} background-color: rgba(64, 188, 255, 0.2);`,
+  green: css`${ButtonOverlayTheme.green} background-color: rgba(40, 217, 132, 0.2);`,
+  gray: css`${ButtonOverlayTheme.gray} background-color: rgba(97, 97, 97, 0.2);`
 };
 
 const ThemedButtonBadge = css`
