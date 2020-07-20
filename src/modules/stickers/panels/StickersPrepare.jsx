@@ -19,10 +19,10 @@ const Header = styled.div`
 const HeaderUser = styled.div`
   display: flex;
   align-items: center;
-  margin-left: 10px;
+  margin-left: 4px;
 
   .Avatar {
-    margin-left: 5px;
+    margin-left: 4px;
   }
 `;
 
