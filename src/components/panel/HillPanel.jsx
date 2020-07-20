@@ -49,7 +49,7 @@ const HillPanelContent = styled(Div)`
   line-height: 26px;
   font-weight: 500;
 
-  z-index: 1;
+  z-index: 2;
 
   @media (min-width: 450px) {
     top: -48px;
@@ -70,9 +70,6 @@ const HillPanelAffix = styled(Div)`
 
   color: #fff;
   background-color: transparent;
-
-  font-size: 26px;
-  line-height: 32px;
 
   width: 100%;
   max-width: 432px;
@@ -162,7 +159,7 @@ const HillPanelHeader = styled.div`
 const Hill = styled.svg`
   display: block;
   position: absolute;
-  z-index: -1;
+  z-index: 1;
 
   width: 100%;
   max-width: 748px;
@@ -241,6 +238,7 @@ const HillPanel = (props) => {
         </HillPanelRow>
         <ThemedButton
           $color={props.color}
+          disabled={props.disabled}
           onClick={props.goForward}
         >
           {props.postfix}
@@ -260,7 +258,8 @@ HillPanel.propTypes = {
   goForward: PropTypes.func.isRequired,
   goBack: PropTypes.func.isRequired,
   count: PropTypes.node.isRequired,
-  time: PropTypes.node.isRequired
+  time: PropTypes.node.isRequired,
+  disabled: PropTypes.node
 };
 
 export default HillPanel;

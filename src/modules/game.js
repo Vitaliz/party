@@ -54,6 +54,12 @@ export default class Game {
 
     // react to errors
     this.peer.on('error', this.handleError.bind(this));
+    // simple reconnect
+    this.peer.on('disconnected', () => {
+      if (!this.peer.destroyed) {
+        this.peer.reconnect();
+      }
+    });
     // wait open state
     this.peer.on('open', () => {
       this.peer.on('connection', this.handleConnection.bind(this));
@@ -93,9 +99,11 @@ export default class Game {
     });
   }
 
-  handleConnection(connection) {
+  handleConnection(connection, callback) {
     this.subscribe(connection, () => {
-      // TODO
+      if (typeof callback === 'function') {
+        callback(+connection.peer);
+      }
     });
   }
 
@@ -169,7 +177,7 @@ export default class Game {
   }
 
   _signalMetaResponse(peerId, data) {
-    this.meta.set(+peerId, data);
+    this.meta.set(+peerId, data.payload);
   }
 
   send(peerId, data) {

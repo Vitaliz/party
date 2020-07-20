@@ -7,6 +7,7 @@ import Main from '../panels/Main';
 import Alias from '../panels/Alias';
 import Stickers from '../panels/Stickers';
 import Croco from '../panels/Croco';
+import Mafia from '../panels/Mafia';
 
 import PopoutProvider from '../components/overlay/PopoutProvider';
 import ModalProvider from '../components/overlay/ModalProvider';
@@ -40,6 +41,10 @@ const Home = ({ id }) => {
       />
       <Croco
         id="croco"
+        goBack={panels.goBack}
+      />
+      <Mafia
+        id="mafia"
         goBack={panels.goBack}
       />
     </View>

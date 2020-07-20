@@ -8,7 +8,7 @@ import Tabs from '../components/Tabs';
 import Checkbox from '../components/Checkbox';
 import { TabsItem, Headline, Group } from '@vkontakte/vkui';
 
-import { useState, useMemo } from '../../../hooks/base';
+import { useState, useMemo, useImmutableCallback } from '../../../hooks/base';
 import { useStore } from '../../../hooks/store';
 
 const TIME = [60, 90, 120, 150, 180];
@@ -25,10 +25,12 @@ const AliasSettings = ({ id, goBack, goForward }) => {
 
   const [time, setTime] = useState(() => store.game.time || TIME[0]);
   const [point, setPoint] = useState(() => store.game.point || POINT[0]);
+  const [away, setAway] = useState(() => store.game.away || false);
 
   const openTeams = () => {
     store.game.time = time;
     store.game.point = point;
+    store.game.away = away;
 
     goForward('teams');
   };
@@ -65,6 +67,10 @@ const AliasSettings = ({ id, goBack, goForward }) => {
     });
   }, [point]);
 
+  const onChange = useImmutableCallback((e) => {
+    setAway(e.target.checked);
+  });
+
   return (
     <GradientPanel
       id={id}
@@ -97,7 +103,12 @@ const AliasSettings = ({ id, goBack, goForward }) => {
           {pointTabs}
         </Tabs>
       </Group>
-      <Checkbox>Каждое пропущенное слово отнимает очки</Checkbox>
+      <Checkbox
+        checked={away}
+        onChange={onChange}
+      >
+        Каждое пропущенное слово отнимает очки
+      </Checkbox>
     </GradientPanel>
   );
 };

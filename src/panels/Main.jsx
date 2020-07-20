@@ -39,20 +39,20 @@ const MainSubscribe = styled(Subscribe)`
 `;
 
 const Main = ({ id, goForward }) => {
-  const openAlias = useImmutableCallback(() => {
-    goForward('alias');
-  });
-
   const openStickers = useImmutableCallback(() => {
     goForward('stickers');
   });
 
+  const openAlias = useImmutableCallback(() => {
+    goForward('alias');
+  });
+
   const openCroco = useImmutableCallback(() => {
-    // callback('croco');
+    goForward('croco');
   });
 
   const openMafia = useImmutableCallback(() => {
-    // callback('mafia');
+    goForward('mafia');
   });
 
   return (
@@ -64,20 +64,20 @@ const Main = ({ id, goForward }) => {
     >
       <MainHorizontalScroll>
         <Card
-          color="yellow"
-          name="Алиас"
-          description="Объясняй слова!"
-          count={SETTINGS.alias.count}
-          time={SETTINGS.alias.time}
-          callback={openAlias}
-        />
-        <Card
           color="blue"
           name="Стикерочки"
           description="Угадай, кто ты!"
           count={SETTINGS.stickers.count}
           time={SETTINGS.stickers.time}
           callback={openStickers}
+        />
+        <Card
+          color="yellow"
+          name="Алиас"
+          description="Объясняй слова!"
+          count={SETTINGS.alias.count}
+          time={SETTINGS.alias.time}
+          callback={openAlias}
         />
         <Card
           color="green"

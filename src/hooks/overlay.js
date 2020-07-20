@@ -1,4 +1,5 @@
 import globalBus from '../utils/bus';
+import { useRouter } from './router';
 
 const modal = {
   current: null,
@@ -30,7 +31,29 @@ function usePopout() {
   return popout;
 }
 
+function useClearOverlay() {
+  const router = useRouter();
+  const callback = (fn, type) => () => fn(type);
+
+  return (fn) => {
+    switch (router.state) {
+      case 'modal':
+        globalBus.once('modal:closed', callback(fn, 'modal'));
+        globalBus.emit('modal:close');
+        return;
+      case 'popout':
+        globalBus.once('popout:closed', callback(fn, 'popout'));
+        globalBus.emit('popout:close');
+        return;
+      default:
+        fn('default');
+        return;
+    }
+  };
+}
+
 export {
   useModal,
-  usePopout
+  usePopout,
+  useClearOverlay
 };

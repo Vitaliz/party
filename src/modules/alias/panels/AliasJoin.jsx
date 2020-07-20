@@ -5,9 +5,10 @@ import GradientPanel from '../../../components/panel/GradientPanel';
 import ThemedButton from '../../../components/common/ThemedButton';
 import QRModal from '../../../components/overlay/QRModal';
 import TeamCard from '../components/TeamCard';
+import { ScreenSpinner } from '@vkontakte/vkui';
 
-import { useCompute, useForceUpdate, useImmutableCallback, useMount, useUnmount } from '../../../hooks/base';
-import { useModal } from '../../../hooks/overlay';
+import { useCompute, useForceUpdate, useImmutableCallback, useMount, useUnmount, useEffect } from '../../../hooks/base';
+import { useModal, usePopout, useClearOverlay } from '../../../hooks/overlay';
 
 import Core from '../core';
 import { generateInviteLink } from '../../../utils/uri';
@@ -18,15 +19,15 @@ import { generateInviteLink } from '../../../utils/uri';
  * @param {Object} props
  * @param {Core} props.game
  */
-const AliasJoin = ({ game, id, goBack }) => {
+const AliasJoin = ({ game, id, goBack, goForward }) => {
+  const clearOverlay = useClearOverlay();
   const modal = useModal();
+  const popout = usePopout();
 
   const update = useForceUpdate();
-
   useMount(() => {
     game.attach(update);
   });
-
   useUnmount(() => {
     game.detach(update);
   });
@@ -36,18 +37,40 @@ const AliasJoin = ({ game, id, goBack }) => {
   };
 
   const canStart = useCompute(() => {
-    return game.settings.teams && (game.connections.size + 1) >= game.settings.teams.length;
+    if (game.host === game.id) {
+      const isMinimal = game.settings.teams &&
+        (game.connections.size + 1) >= game.settings.teams.length;
+
+      const isJoined = game.settings.teams.reduce((acc, team) => {
+        acc += team.users.length;
+        return acc;
+      }, 0);
+
+      return isMinimal && isJoined && game.isSynchronized();
+    }
+
+    const isJoined = game.settings.teams &&
+      game.settings.teams.some((team) => {
+        return team.users.some((user) => {
+          return +user.vkUserId === game.id;
+        });
+      });
+
+    return isJoined;
   });
 
   const startGame = () => {
-    console.log('start');
+    clearOverlay(() => {
+      popout.show(() => (
+        <ScreenSpinner />
+      ));
+
+      game.ready();
+    });
   };
 
   const maxUsersInTeam = useCompute(() => {
-    if (!game.settings.teams) {
-      return 0;
-    }
-    return Math.ceil((game.connections.size + 1) / game.settings.teams.length);
+    return game.maxUsersInTeam();
   });
 
   const renderTeams = useCompute(() => {
@@ -56,7 +79,7 @@ const AliasJoin = ({ game, id, goBack }) => {
     }
     return game.settings.teams.map((team) => {
       const checked = team.users.some((user) => {
-        return user.vkUserId === +game.peer.id;
+        return +user.vkUserId === game.id;
       });
       return (
         <TeamCard
@@ -72,11 +95,17 @@ const AliasJoin = ({ game, id, goBack }) => {
   });
 
   const showQR = useImmutableCallback(() => {
-    const link = generateInviteLink('alias', game.peer.id);
+    const link = generateInviteLink('alias', game.host);
 
     modal.show(() => (
       <QRModal link={link} color="yellow" />
     ));
+  });
+
+  useEffect(() => {
+    if (game.stage !== null) {
+      goForward();
+    }
   });
 
   return (

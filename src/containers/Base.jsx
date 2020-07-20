@@ -15,9 +15,8 @@ import { initView } from '../utils/view';
 import { interpretResponse } from '../utils/data';
 
 import { useState, useEffect, useMount, useCompute } from '../hooks/base';
-import { useRouter } from '../hooks/router';
 import { useBridge, useBus } from '../hooks/util';
-import { useModal } from '../hooks/overlay';
+import { useModal, useClearOverlay } from '../hooks/overlay';
 import { useStorage, useStore } from '../hooks/store';
 import { useFetch } from '../hooks/fetch';
 import { usePlatform, ANDROID } from '@vkontakte/vkui';
@@ -25,7 +24,6 @@ import { usePlatform, ANDROID } from '@vkontakte/vkui';
 import Game from '../modules/game';
 
 const Base = () => {
-  const router = useRouter();
   const bridge = useBridge();
   const modal = useModal();
   const bus = useBus();
@@ -33,6 +31,8 @@ const Base = () => {
   const store = useStore();
   const fetch = useFetch();
   const platform = usePlatform();
+
+  const clearOverlay = useClearOverlay();
 
   const [loaded, updateLoadState] = useState(false);
   const [ready, updateReadyState] = useState(false);
@@ -87,16 +87,10 @@ const Base = () => {
 
       const prepare = () => {
         return new Promise((resolve) => {
-          switch (router.state) {
-            case 'modal':
-              bus.once('modal:closed', resolve);
-              bus.emit('modal:close');
-              return;
-            case 'popout':
-              bus.once('popout:closed', resolve);
-              bus.emit('popout:close');
-              return;
-            default:
+          clearOverlay((after) => {
+            if (after === 'modal' || after === 'popout') {
+              resolve();
+            } else {
               window.requestAnimationFrame(() => {
                 window.setTimeout(() => {
                   window.requestAnimationFrame(() => {
@@ -104,8 +98,8 @@ const Base = () => {
                   });
                 }, 1200);
               });
-              return;
-          }
+            }
+          });
         });
       };
 

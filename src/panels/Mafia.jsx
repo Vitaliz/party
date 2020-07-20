@@ -4,37 +4,35 @@ import PropTypes from 'prop-types';
 import Affix from '../components/common/Affix';
 import RoundButton from '../components/common/RoundButton';
 import HillPanel from '../components/panel/HillPanel';
-import AliasRules from '../components/rules/AliasRules';
+import MafiaRules from '../components/rules/CrocoRules';
 
 import { useModal } from '../hooks/overlay';
 import { useImmutableCallback } from '../hooks/base';
-import { useBus } from '../hooks/util';
 
 import { SETTINGS } from '../utils/constants';
 
-const Alias = ({ id, goBack }) => {
-  const bus = useBus();
+const Mafia = ({ id, goBack }) => {
   const modal = useModal();
 
   const openRules = useImmutableCallback(() => {
     modal.show(() => (
-      <AliasRules />
+      <MafiaRules />
     ));
   });
 
-  const prepare = useImmutableCallback(() => {
-    bus.emit('app:view', 'alias-prepare');
-  });
+  const prepare = () => {
+    // TODO
+  };
 
   return (
     <HillPanel
       id={id}
       goBack={goBack}
       goForward={prepare}
-      title="Алиас"
+      title="Мафия"
       count={SETTINGS.alias.count}
       time={SETTINGS.alias.time}
-      color="yellow"
+      color="gray"
       affix={(
         <Affix>
           <span>Описание</span>
@@ -44,21 +42,17 @@ const Alias = ({ id, goBack }) => {
       postfix="Скоро"
       disabled={true}
     >
-      Алиас — классика настольных игр
-      по объяснению слов. Каждый из
-      игроков по очереди должен за
-      ограниченное время объяснить
-      своей команде слова, указанные
-      на игровых карточках. Игра
-      встречается в множестве популярных
-      сериалов, например, в &#40;Доктор Хаус&#41;!
+      Крокодил – классическая словестная игра,
+      основным правилом которой является
+      показывание слов жестами  или движениями
+      без словестного произношения.
     </HillPanel>
   );
 };
 
-Alias.propTypes = {
+Mafia.propTypes = {
   id: PropTypes.string.isRequired,
   goBack: PropTypes.func.isRequired
 };
 
-export default Alias;
+export default Mafia;

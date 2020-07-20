@@ -105,6 +105,10 @@ const GradientPanelPostfix = styled(Div)`
     padding-left: 0;
     padding-right: 0;
   }
+
+  .Button + .Button {
+    margin-top: 12px;
+  }
 `;
 
 const GradientPanel = (props) => {
@@ -127,9 +131,11 @@ const GradientPanel = (props) => {
       <GradientPanelContent>
         {props.children}
       </GradientPanelContent>
-      <GradientPanelPostfix>
-        {props.postfix}
-      </GradientPanelPostfix>
+      {props.postfix && (
+        <GradientPanelPostfix>
+          {props.postfix}
+        </GradientPanelPostfix>
+      )}
     </GradientPanelUnified>
   );
 };
