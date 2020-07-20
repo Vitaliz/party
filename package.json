@@ -71,6 +71,7 @@
     "react-scripts": "^3.4.1",
     "react-tappable": "^1.0.4",
     "react-transition-group": "^4.4.1",
+    "socket.io-client": "^1.4.8",
     "ssr-window": "^2.0.0",
     "styled-components": "^5.1.1",
     "swr": "^0.2.3",
