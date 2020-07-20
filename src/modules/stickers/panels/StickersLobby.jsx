@@ -32,7 +32,7 @@ const Btn = styled.div`
  *
  * @param {Object} props
  */
-const StickersLobby = ({id, game, goBack, isCreator, start}) => {
+const StickersLobby = ({id, game, close, isCreator, start}) => {
   const modal = useModal();
 
   const showQR = useImmutableCallback(() => {
@@ -46,7 +46,7 @@ const StickersLobby = ({id, game, goBack, isCreator, start}) => {
   return (
     <GradientPanel
       id={id}
-      onBack={goBack}
+      onClose={close}
       title="Лобби"
       color="blue"
       postfix={(
@@ -87,7 +87,7 @@ StickersLobby.propTypes = {
   id: PropTypes.string.isRequired,
   game: PropTypes.object.isRequired,
   isCreator: PropTypes.bool.isRequired,
-  goBack: PropTypes.func.isRequired,
+  close: PropTypes.func.isRequired,
   goForward: PropTypes.func.isRequired,
   start: PropTypes.func.isRequired
 };

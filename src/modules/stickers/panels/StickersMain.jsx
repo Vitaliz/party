@@ -64,7 +64,7 @@ const StickersPlayer = ({gameUser, word}) => {
  *
  * @param {Object} props
  */
-const StickersMain = ({id, game, goBack, wordGot}) => {
+const StickersMain = ({id, game, close, wordGot}) => {
 
   const gameUsers = game.gameUsers;
 
@@ -82,6 +82,10 @@ const StickersMain = ({id, game, goBack, wordGot}) => {
       return '???';
     }
 
+    if (gameUser.word) {
+      return '...';
+    }
+
     return gameUser.word;
   };
 
@@ -90,9 +94,9 @@ const StickersMain = ({id, game, goBack, wordGot}) => {
   return (
     <GradientPanel
       id={id}
-      onBack={goBack}
       title="Лобби"
       color="blue"
+      onClose={close}
       postfix={(
         <div>
 
@@ -121,7 +125,7 @@ const StickersMain = ({id, game, goBack, wordGot}) => {
 StickersMain.propTypes = {
   id: PropTypes.string.isRequired,
   game: PropTypes.object.isRequired,
-  goBack: PropTypes.func.isRequired,
+  close: PropTypes.func.isRequired,
   wordGot: PropTypes.func.isRequired
 };
 

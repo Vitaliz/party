@@ -96,9 +96,9 @@ const StickersGame = ({id}) => {
     });
   }, []);
 
-  // const close = useImmutableCallback(() => {
-  //   bus.emit('app:view', 'home');
-  // });
+  const close = useImmutableCallback(() => {
+    bus.emit('app:view', 'home');
+  });
 
   const start = useImmutableCallback(() => {
     bus.emit('app:view', 'stickers-game');
@@ -114,10 +114,10 @@ const StickersGame = ({id}) => {
       popout={<PopoutProvider/>}
       header={false}
     >
-      <StickersLobby game={game} goBack={panels.goBack} id="lobby" goForward={start} isCreator={!gameId}
+      <StickersLobby game={game} close={close} id="lobby" goForward={start} isCreator={!gameId}
         start={startTyping}/>
       <StickersPrepare id="prepare" game={game} goBack={panels.goBack} start={setWord}/>
-      <StickersMain goBack={panels.goBack} id="main" game={game} wordGot={gotWord} />
+      <StickersMain close={close} id="main" game={game} wordGot={gotWord} />
     </StickersView>
   );
 };
