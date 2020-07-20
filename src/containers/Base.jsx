@@ -8,6 +8,7 @@ import Bad from './Bad';
 import ConfigProvider from '../components/common/ConfigProvider';
 
 import Offline from '../components/common/Offline';
+import CodeError from '../components/error/CodeError';
 import CommonError from '../components/error/CommonError';
 
 import sendError from '../utils/error';
@@ -73,6 +74,11 @@ const Base = () => {
             case 'bridge':
             case 'network':
               return false;
+            case 'code':
+              errorModal = (
+                <CodeError />
+              );
+              return true;
             default:
               errorModal = (
                 <CommonError />

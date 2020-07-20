@@ -101,10 +101,10 @@ const App = () => {
       } else {
         if (shouldShowError) {
           if (store.user.vkUserId) {
-            bus.emit('app:error');
+            bus.emit('app:error', 'code');
           } else {
             bus.once('app:auth', () => {
-              bus.emit('app:error');
+              bus.emit('app:error', 'code');
             });
           }
         }

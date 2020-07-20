@@ -52,11 +52,19 @@ export function initView() {
       switch (event.detail.type) {
         case 'VKWebAppUpdateConfig':
         case 'VKWebAppUpdateInsets':
-        case 'VKWebAppViewRestore':
         case 'VKWebAppLocationChanged':
+          updateView();
+          break;
+        case 'VKWebAppViewRestore':
         case 'VKWebAppOpenQRResult':
         case 'VKWebAppOpenCodeReaderResult':
-          updateView();
+          window.requestAnimationFrame(() => {
+            window.setTimeout(() => {
+              window.requestAnimationFrame(() => {
+                updateView();
+              });
+            }, 230);
+          });
           break;
       }
     });

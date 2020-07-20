@@ -25,8 +25,8 @@ export default function sendError(morph = window.event, raw, source) {
     type: null
   };
 
-  if (source === 'join:error') {
-    send.type = 'join';
+  if (morph === 'code') {
+    send.type = 'code';
     return Promise.resolve(send);
   }
 
