@@ -148,7 +148,7 @@ const StickersGame = ({id}) => {
       header={false}
     >
       <StickersLobby game={game} close={close} id="lobby" goForward={start}
-                     start={startTyping}/>
+        start={startTyping}/>
       <StickersPrepare id="prepare" game={game} goBack={panels.goBack} start={setWord}/>
       <StickersMain close={close} id="main" game={game} wordGot={gotWord} restartGame={restartGame}/>
     </StickersView>
