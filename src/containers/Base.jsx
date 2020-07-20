@@ -3,20 +3,26 @@ import React from 'react';
 import { CSSTransition } from 'react-transition-group';
 
 import App from './App';
+import Bad from './Bad';
+
+import ConfigProvider from '../components/common/ConfigProvider';
+
 import Offline from '../components/common/Offline';
 import CommonError from '../components/error/CommonError';
 
 import sendError from '../utils/error';
-import initView from '../utils/view';
+import { initView } from '../utils/view';
 import { interpretResponse } from '../utils/data';
 
-import { useState, useEffect, useMount } from '../hooks/base';
+import { useState, useEffect, useMount, useCompute } from '../hooks/base';
 import { useRouter } from '../hooks/router';
 import { useBridge, useBus } from '../hooks/util';
 import { useModal } from '../hooks/overlay';
 import { useStorage, useStore } from '../hooks/store';
 import { useFetch } from '../hooks/fetch';
 import { usePlatform, ANDROID } from '@vkontakte/vkui';
+
+import Game from '../modules/game';
 
 const Base = () => {
   const router = useRouter();
@@ -115,6 +121,7 @@ const Base = () => {
     window.addEventListener('error', handleError);
     window.addEventListener('abort', handleError);
     window.addEventListener('unhandledrejection', handleError);
+    bus.on('app:error', handleError);
   });
 
   useMount(() => {
@@ -203,24 +210,30 @@ const Base = () => {
     }
   }, [loaded]);
 
+  const Component = useCompute(() => {
+    return Game.util.supports.data ? App : Bad;
+  });
+
   return (
     <React.StrictMode>
-      <CSSTransition
-        in={ready}
-        appear={true}
-        mountOnEnter={true}
-        classNames="Root--fade"
-        timeout={platform === ANDROID ? 300 : 600}
-      >
-        {
-          loaded ? (
-            <App />
-          ): (
-            <div className="Root Root--fade-init" />
-          )
-        }
-      </CSSTransition>
-      <Offline visible={showOffline} />
+      <ConfigProvider>
+        <CSSTransition
+          in={ready}
+          appear={true}
+          mountOnEnter={true}
+          classNames="Root--fade"
+          timeout={platform === ANDROID ? 300 : 600}
+        >
+          {
+            loaded ? (
+              <Component />
+            ): (
+              <div className="Root Root--fade-init" />
+            )
+          }
+        </CSSTransition>
+        <Offline visible={showOffline} />
+      </ConfigProvider>
     </React.StrictMode>
   );
 };

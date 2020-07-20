@@ -5,8 +5,20 @@ export const SWIPE_EVENTS = ['dragstart', 'dragenter', 'gesturestart', 'gesturec
 export const AUX_EVENTS = ['auxclick', 'contextmenu'];
 export const DEV_EVENTS = ['keydown'];
 
-export const PARAM_PASSIVE = { passive: true };
-export const PARAM_ACTIVE = { passive: false };
+let test = false;
+try {
+  const opts = Object.defineProperty({}, 'passive', {
+    get() {
+      test = { passive: true };
+      return true;
+    }
+  });
+  window.addEventListener('passive', null, opts);
+  window.removeEventListener('passive', null, opts);
+} catch { /* ignore */ }
+
+export const PARAM_PASSIVE = test;
+export const PARAM_ACTIVE = test && { passive: false };
 
 export const forcePrevent = (e = window.event) => {
   if (!e) {
@@ -87,7 +99,47 @@ export const resize = {
     window.requestAnimationFrame(fn);
 
     return () => {
-      bus.detach('resize', fn);
+      resize.detach(fn);
     };
+  },
+  detach(fn) {
+    bus.detach('resize', fn);
+  }
+};
+
+export const scroll = {
+  _inited: false,
+  _init() {
+    if (this._inited) {
+      return;
+    }
+
+    let ticking = false;
+    const tick = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          bus.emit('scroll');
+
+          ticking = false;
+        });
+
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', tick, PARAM_PASSIVE);
+  },
+  attach(fn) {
+    bus.on('scroll', fn);
+
+    this._init();
+    window.requestAnimationFrame(fn);
+
+    return () => {
+      scroll.detach(fn);
+    };
+  },
+  detach(fn) {
+    bus.detach('scroll', fn);
   }
 };

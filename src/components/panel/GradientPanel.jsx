@@ -5,11 +5,22 @@ import styled, { css } from 'styled-components/macro';
 import { Panel, PanelHeaderSimple, PanelHeaderBack, PanelHeaderClose, Div } from '@vkontakte/vkui';
 
 const GradientTheme = {
-  yellow: css`background-image: linear-gradient(170deg, #FFCC4E 4%, #FFA54F 96%);`,
-  blue: css`background-image: linear-gradient(170deg, #39DDFE 4%, #40BCFF 96%);`
+  yellow: css`
+    background-image: linear-gradient(180deg, #FFCC4E 64px, #FFA54F 96%);
+    background-image: linear-gradient(180deg, #FFCC4E calc(64px + var(--safe-area-inset-top, 0px)), #FFA54F 96%);
+  `,
+  blue: css`
+    background-image: linear-gradient(180deg, #39DDFE 64px, #40BCFF 96%);
+    background-image: linear-gradient(180deg, #39DDFE calc(64px + var(--safe-area-inset-top, 0px)), #40BCFF 96%);
+  `
 };
 
-const GradientPanelUnified = styled.div`
+const GradientFillTheme = {
+  yellow: css`background-color: #FFCC4E;`,
+  blue: css`background-color: #39DDFE;`
+};
+
+const GradientPanelUnified = styled(Panel)`
   &:after {
     ${(props) => GradientTheme[props.$color]}
   }
@@ -24,12 +35,27 @@ const GradientPanelUnified = styled.div`
     align-content: stretch;
     align-items: stretch;
   }
+
+  .Tappable--ios,
+  .Tappable--android {
+    &.Tappable--active:not([disabled]):not(.TabsItem):not(.PanelHeaderButton):not(.Button):not(.PanelHeaderContent__in):not(.ActionSheetItem):not(.Banner__in) {
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .Tappable__wave {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
 `;
 
-const GradientPanelHeader = styled.div`
+const GradientPanelHeader = styled(PanelHeaderSimple)`
   &,
   .PanelHeader__fixed {
     background-color: transparent;
+  }
+
+  .PanelHeader__fixed {
+    ${(props) => GradientFillTheme[props.$color]}
   }
 
   .PanelHeader__left,
@@ -87,17 +113,16 @@ const GradientPanel = (props) => {
   return (
     <GradientPanelUnified
       id={props.id}
-      as={Panel}
       separator={false}
       $color={props.color}
     >
       <GradientPanelHeader
-        as={PanelHeaderSimple}
         separator={false}
         left={(
           props.onBack && (<PanelHeaderBack onClick={props.onBack} />) ||
           props.onClose && (<PanelHeaderClose onClick={props.onClose} />)
         )}
+        $color={props.color}
       >
         {props.title}
       </GradientPanelHeader>

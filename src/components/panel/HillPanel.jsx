@@ -104,7 +104,7 @@ const HillPanelPostfix = styled(Div)`
 
 const HillPanelGradient = styled.div`
   position: absolute;
-  z-index: 7;
+  z-index: 2;
 
   top: 0;
   left: 0;
@@ -114,8 +114,6 @@ const HillPanelGradient = styled.div`
 
   height: 2000px;
   transform: translateY(-1680px);
-  will-change: transform;
-  backface-visibility: hidden;
 
   pointer-events: none;
   touch-action: none;

@@ -4,9 +4,11 @@ import styled from 'styled-components/macro';
 
 import { Panel, PanelHeaderSimple, Div } from '@vkontakte/vkui';
 
+const BACKGOUND_IMAGE = require(/* webpackPreload: true */ '../../assets/bg.png');
+
 const RichPanelUnified = styled.div`
   &:after {
-    background-image: url(${require(/* webpackPreload: true */ '../../assets/bg.png')});
+    background-image: url(${BACKGOUND_IMAGE});
     background-size: 100% auto;
     background-repeat: repeat-y;
   }

@@ -35,10 +35,6 @@ img {
   will-change: transform;
 }
 
-.Tappable--ios.Tappable--active:not([disabled]):not(.TabsItem):not(.PanelHeaderButton):not(.Button):not(.PanelHeaderContent__in):not(.ActionSheetItem):not(.Banner__in) {
-  background: rgba(215, 216, 217, 0.4) !important;
-}
-
 .Tappable:not([disabled]) {
   cursor: pointer;
 }
@@ -99,6 +95,10 @@ img {
 
 .Spinner {
   margin: auto;
+}
+
+.PanelHeader {
+  z-index: 4;
 }
 
 .PanelHeader--android .PanelHeader__content,

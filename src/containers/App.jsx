@@ -1,6 +1,7 @@
 import React from 'react';
 
-import {ConfigProvider, Root} from '@vkontakte/vkui';
+
+import {Root} from '@vkontakte/vkui';
 
 import Home from '../views/Home';
 
@@ -99,9 +100,13 @@ const App = () => {
         }
       } else {
         if (shouldShowError) {
-          bus.once('app:auth', () => {
-            bus.emit('code:error');
-          });
+          if (store.user.vkUserId) {
+            bus.emit('app:error');
+          } else {
+            bus.once('app:auth', () => {
+              bus.emit('app:error');
+            });
+          }
         }
         bus.emit('app:update');
       }
@@ -130,15 +135,13 @@ const App = () => {
   });
 
   return (
-    <ConfigProvider>
-      <Root activeView={view}>
-        <Home id="home"/>
-        <AliasPrepare id="alias-prepare"/>
-        <AliasGame id="alias-game"/>
+    <Root activeView={view}>
+      <Home id="home"/>
+      <AliasPrepare id="alias-prepare"/>
+      <AliasGame id="alias-game"/>
 
-        <StickersGame id="stickers-game"/>
-      </Root>
-    </ConfigProvider>
+      <StickersGame id="stickers-game"/>
+    </Root>
   );
 };
 

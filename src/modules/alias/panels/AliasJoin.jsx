@@ -35,6 +35,14 @@ const AliasJoin = ({ game, id, goBack }) => {
     game.join(name);
   };
 
+  const canStart = useCompute(() => {
+    return game.settings.teams && (game.connections.size + 1) >= game.settings.teams.length;
+  });
+
+  const startGame = () => {
+    console.log('start');
+  };
+
   const maxUsersInTeam = useCompute(() => {
     if (!game.settings.teams) {
       return 0;
@@ -74,17 +82,30 @@ const AliasJoin = ({ game, id, goBack }) => {
   return (
     <GradientPanel
       id={id}
-      onBack={goBack}
+      onClose={goBack}
       title="Лобби"
       color="yellow"
       postfix={(
-        <ThemedButton
-          $color="yellow"
-          $overlay={true}
-          onClick={showQR}
-        >
-          Пригласить
-        </ThemedButton>
+        <>
+          {
+            canStart && (
+              <ThemedButton
+                $color="yellow"
+                $overlay={true}
+                onClick={startGame}
+              >
+                Начать
+              </ThemedButton>
+            )
+          }
+          <ThemedButton
+            $color="yellow"
+            $overlay={true}
+            onClick={showQR}
+          >
+            Пригласить
+          </ThemedButton>
+        </>
       )}
     >
       {renderTeams}
