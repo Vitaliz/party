@@ -14,7 +14,7 @@ if ('console' in context) {
   const WARN_STYLE = `font-size:20px;font-weight:600;${FONT_FAMILY}`;
   const WARN_MESSAGE = `Эта функция браузера предназначена для разработчиков. Если кто-то сказал вам скопировать и вставить что-то здесь, чтобы включить функцию приложения или «взломать» чей-то аккаунт, это мошенники. Выполнив эти действия, вы предоставите им доступ к своему аккаунту.`;
 
-  const LOGO_TEMPLATE = `%cGAME`;
+  const LOGO_TEMPLATE = `%cPARTY %cGAMES`;
   const LOGO_STYLE = `color:#000;font-size:50px;font-weight:800;${FONT_FAMILY}`;
 
   const SUPPORT_TEMPLATE = `%c%s %o`;

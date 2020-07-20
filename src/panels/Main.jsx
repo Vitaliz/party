@@ -58,7 +58,7 @@ const Main = ({ id, goForward }) => {
   return (
     <RichPanel
       id={id}
-      title="partygame"
+      title="Party Games"
       affix={<MainTitle>Во что сыграем?</MainTitle>}
       postfix={<MainSubscribe />}
     >

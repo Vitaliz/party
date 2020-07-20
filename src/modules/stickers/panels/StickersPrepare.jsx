@@ -36,12 +36,10 @@ const Content = styled.div`
  * @param {Object} props
  */
 const StickersPrepare = ({id, game, goBack, start}) => {
-
   const [word, setWord] = useState(null);
   const [status, setStatus] = useState('default');
 
   const checkStart = () => {
-
     if (!word || word.trim() === '') {
       setStatus('error');
       return;
@@ -64,13 +62,9 @@ const StickersPrepare = ({id, game, goBack, start}) => {
 
   const query = parseQuery(window.location.search);
 
-  console.log(query.vk_user_id);
-
   const currentUser = gameUsers.find((gameUser) => {
     return gameUser.user.vkUserId === +query.vk_user_id;
   });
-
-  console.log(currentUser);
 
   return (
     <GradientPanel
@@ -80,8 +74,6 @@ const StickersPrepare = ({id, game, goBack, start}) => {
       color="blue"
       postfix={(
         <div>
-
-
           <ThemedButton
             $color="blue"
             $overlay={true}
@@ -89,8 +81,6 @@ const StickersPrepare = ({id, game, goBack, start}) => {
           >
             Далее
           </ThemedButton>
-
-
         </div>
       )}
     >

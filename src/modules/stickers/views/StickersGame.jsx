@@ -29,19 +29,15 @@ const StickersGame = ({id}) => {
 
   let gameId = store.game.id ?? null;
 
-  console.log('gd', Boolean(gameId));
-
   const panels = useHistory('lobby');
   const bus = useBus();
   const [game, setGame] = useState(null);
 
   const startTyping = () => {
-    console.log('start', game.id);
     socket.emit('start-game-prepare', game.id);
   };
 
   const setWord = (word) => {
-    console.log('set word', word);
     socket.emit('set-word', JSON.stringify({
       gameId: game.id,
       word: word
@@ -55,7 +51,6 @@ const StickersGame = ({id}) => {
   };
 
   const restartGame = () => {
-    console.log('word got');
     socket.emit('restart-game', game.id);
   };
 
@@ -76,13 +71,9 @@ const StickersGame = ({id}) => {
   // }, [game]);
 
   useEffect(() => {
-
-    console.log('on connect');
     if (!gameId) {
-      console.log('create');
       socket.emit('create-game');
     } else {
-      console.log('join');
       socket.emit('join-game', gameId);
       gameId = null;
       store.game.id = null;
@@ -91,40 +82,28 @@ const StickersGame = ({id}) => {
 
     socket.on('game-created', (msg) => {
       const {data} = msg;
-      console.log('game created', data);
-
       setGame(data);
     });
 
     socket.on('game-updated', (msg) => {
       const {data} = msg;
-      console.log('game updated', data);
-
       setGame(data);
     });
 
     socket.on('game-prepared', (msg) => {
       const {data} = msg;
-      console.log('game prepared', data);
-
       setGame(data);
-
       panels.setActivePanel('prepare');
     });
 
     socket.on('game-restarted', (msg) => {
       const {data} = msg;
-      console.log('game restarted', data);
-
       setGame(data);
-
       panels.setActivePanel('prepare');
     });
 
     socket.on('word-set', (msg) => {
       const {data} = msg;
-      console.log('word set', data);
-
       setGame(data);
     });
   }, []);

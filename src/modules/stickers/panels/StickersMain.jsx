@@ -8,7 +8,6 @@ import styled from 'styled-components/macro';
 import ThemedButton from '../../../components/common/ThemedButton';
 import Icon16Done from '@vkontakte/icons/dist/16/done';
 
-
 const PlayerWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -65,10 +64,7 @@ const StickersPlayer = ({gameUser, word}) => {
  * @param {Object} props
  */
 const StickersMain = ({id, game, close, wordGot, restartGame}) => {
-
   const gameUsers = game.gameUsers;
-
-  console.log('gu', gameUsers);
 
   const query = parseQuery(window.location.search);
 
@@ -96,8 +92,6 @@ const StickersMain = ({id, game, close, wordGot, restartGame}) => {
     return gameUser.word;
   };
 
-  console.log(currentUser);
-
   return (
     <GradientPanel
       id={id}
@@ -106,7 +100,6 @@ const StickersMain = ({id, game, close, wordGot, restartGame}) => {
       onClose={close}
       postfix={(
         <div>
-
           {!currentUser.isFinished && <ThemedButton
             $color="blue"
             $overlay={true}
@@ -114,7 +107,6 @@ const StickersMain = ({id, game, close, wordGot, restartGame}) => {
           >
             Я угадал!
           </ThemedButton>}
-
           {(isCreator && game.finishedAt !==null) && <ThemedButton
             $color="blue"
             $overlay={true}
@@ -122,7 +114,6 @@ const StickersMain = ({id, game, close, wordGot, restartGame}) => {
           >
             Начать новую
           </ThemedButton>}
-
         </div>
       )}
     >
