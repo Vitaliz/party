@@ -57,7 +57,9 @@ export function initView() {
           break;
         case 'VKWebAppViewRestore':
         case 'VKWebAppOpenQRResult':
+        case 'VKWebAppOpenQRFailed':
         case 'VKWebAppOpenCodeReaderResult':
+        case 'VKWebAppOpenCodeReaderFailed':
           window.requestAnimationFrame(() => {
             window.setTimeout(() => {
               window.requestAnimationFrame(() => {
