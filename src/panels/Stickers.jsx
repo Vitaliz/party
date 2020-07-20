@@ -10,9 +10,15 @@ import { useModal } from '../hooks/overlay';
 import { useImmutableCallback } from '../hooks/base';
 
 import { SETTINGS } from '../utils/constants';
+import {useBus} from '../hooks/util';
 
 const Stickers = ({ id, goBack }) => {
   const modal = useModal();
+  const bus = useBus();
+
+  const prepare = useImmutableCallback(() => {
+    bus.emit('app:view', 'stickers-game');
+  });
 
   const openRules = useImmutableCallback(() => {
     modal.show(() => (
@@ -24,10 +30,13 @@ const Stickers = ({ id, goBack }) => {
     <HillPanel
       id={id}
       callback={goBack}
+      goForward={prepare}
+      goBack={goBack}
       title="Стикерочки"
       count={SETTINGS.stickers.count}
       time={SETTINGS.stickers.time}
       color="blue"
+      postfix="Начать"
       affix={(
         <Affix>
           <span>Описание</span>

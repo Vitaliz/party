@@ -76,6 +76,8 @@ const GradientPanelHeader = styled(PanelHeaderSimple)`
 
 const GradientPanelContent = styled(Div)`
   position: relative;
+  display: flex;
+  flex-direction: column;
 
   flex-shrink: 1;
   flex-grow: 1;
@@ -147,7 +149,8 @@ GradientPanel.propTypes = {
   postfix: PropTypes.node.isRequired,
   color: PropTypes.oneOf(['yellow', 'blue']).isRequired,
   onBack: PropTypes.func,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
+  isContentFlex: PropTypes.bool
 };
 
 export default GradientPanel;
