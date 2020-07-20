@@ -6,6 +6,7 @@ import {Avatar} from '@vkontakte/vkui';
 
 const UserBubblesWrapper = styled.div`
   display: flex;
+  flex-wrap: wrap;
   flex-grow: 1;
   justify-content: space-around;
   align-items: center;

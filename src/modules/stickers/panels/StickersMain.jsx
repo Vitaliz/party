@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import PropTypes from 'prop-types';
 
 import GradientPanel from '../../../components/panel/GradientPanel';
@@ -64,7 +64,7 @@ const StickersPlayer = ({gameUser, word}) => {
  *
  * @param {Object} props
  */
-const StickersMain = ({id, game, close, wordGot}) => {
+const StickersMain = ({id, game, close, wordGot, restartGame}) => {
 
   const gameUsers = game.gameUsers;
 
@@ -72,6 +72,13 @@ const StickersMain = ({id, game, close, wordGot}) => {
 
   const query = parseQuery(window.location.search);
 
+  const isCreator = useMemo(() => {
+    if (!game) {
+      return false;
+    }
+    const query = parseQuery(window.location.search);
+    return +query.vk_user_id === game.creator.vkUserId;
+  }, game);
 
   const currentUser = gameUsers.find((gameUser) => {
     return gameUser.user.vkUserId === +query.vk_user_id;
@@ -82,7 +89,7 @@ const StickersMain = ({id, game, close, wordGot}) => {
       return '???';
     }
 
-    if (gameUser.word) {
+    if (!gameUser.word) {
       return '...';
     }
 
@@ -100,13 +107,21 @@ const StickersMain = ({id, game, close, wordGot}) => {
       postfix={(
         <div>
 
-          <ThemedButton
+          {!currentUser.isFinished && <ThemedButton
             $color="blue"
             $overlay={true}
             onClick={wordGot}
           >
             Я угадал!
-          </ThemedButton>
+          </ThemedButton>}
+
+          {(isCreator && game.finishedAt !==null) && <ThemedButton
+            $color="blue"
+            $overlay={true}
+            onClick={restartGame}
+          >
+            Начать новую
+          </ThemedButton>}
 
         </div>
       )}
@@ -126,7 +141,8 @@ StickersMain.propTypes = {
   id: PropTypes.string.isRequired,
   game: PropTypes.object.isRequired,
   close: PropTypes.func.isRequired,
-  wordGot: PropTypes.func.isRequired
+  wordGot: PropTypes.func.isRequired,
+  restartGame: PropTypes.func.isRequired
 };
 
 StickersPlayer.propTypes = {
