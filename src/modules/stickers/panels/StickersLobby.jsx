@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import GradientPanel from '../../../components/panel/GradientPanel';
@@ -7,13 +7,11 @@ import QRModal from '../../../components/overlay/QRModal';
 
 import styled from 'styled-components/macro';
 
-
-import {useImmutableCallback} from '../../../hooks/base';
+import {useImmutableCallback, useMemo} from '../../../hooks/base';
 import {useModal} from '../../../hooks/overlay';
 
 import {generateInviteLink, parseQuery} from '../../../utils/uri';
 import UserBubbles from '../components/UserBubbles';
-
 
 const ConnectingTitle = styled.div`
   color: #fff;
@@ -41,7 +39,7 @@ const StickersLobby = ({id, game, close, start}) => {
     }
     const query = parseQuery(window.location.search);
     return +query.vk_user_id === game.creator.vkUserId;
-  }, game);
+  }, [game]);
 
   const isReadyToStart = useMemo(() => {
     if (!game) {
@@ -90,7 +88,6 @@ const StickersLobby = ({id, game, close, start}) => {
               </Btn>}
             </>
           )}
-
         </div>
       )}
     >

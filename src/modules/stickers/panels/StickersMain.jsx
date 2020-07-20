@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import GradientPanel from '../../../components/panel/GradientPanel';
@@ -7,6 +7,8 @@ import {Avatar} from '@vkontakte/vkui';
 import styled from 'styled-components/macro';
 import ThemedButton from '../../../components/common/ThemedButton';
 import Icon16Done from '@vkontakte/icons/dist/16/done';
+
+import {useMemo} from '../../../hooks/base';
 
 const PlayerWrapper = styled.div`
   display: flex;
@@ -47,7 +49,6 @@ const StickersPlayer = ({gameUser, word}) => {
     <PlayerWrapper>
       <PlayerAvatar>
         <Avatar src={gameUser.user.avatar} size={72}/>
-
         {gameUser.isFinished && (
           <AvatarIcon><Icon16Done /></AvatarIcon>
         )}
@@ -57,13 +58,12 @@ const StickersPlayer = ({gameUser, word}) => {
   );
 };
 
-
 /**
  * Join screen
  *
  * @param {Object} props
  */
-const StickersMain = ({id, game, close, wordGot, restartGame}) => {
+const StickersMain = ({id, game, wordGot, restartGame, close}) => {
   const gameUsers = game.gameUsers;
 
   const query = parseQuery(window.location.search);
@@ -96,8 +96,8 @@ const StickersMain = ({id, game, close, wordGot, restartGame}) => {
     <GradientPanel
       id={id}
       title="Лобби"
+      onClose={game.finishedAt !== null && close}
       color="blue"
-      onClose={close}
       postfix={(
         <div>
           {!currentUser.isFinished && <ThemedButton
@@ -107,7 +107,7 @@ const StickersMain = ({id, game, close, wordGot, restartGame}) => {
           >
             Я угадал!
           </ThemedButton>}
-          {(isCreator && game.finishedAt !==null) && <ThemedButton
+          {(isCreator && game.finishedAt !== null) && <ThemedButton
             $color="blue"
             $overlay={true}
             onClick={restartGame}
@@ -131,9 +131,9 @@ const StickersMain = ({id, game, close, wordGot, restartGame}) => {
 StickersMain.propTypes = {
   id: PropTypes.string.isRequired,
   game: PropTypes.object.isRequired,
-  close: PropTypes.func.isRequired,
   wordGot: PropTypes.func.isRequired,
-  restartGame: PropTypes.func.isRequired
+  restartGame: PropTypes.func.isRequired,
+  close: PropTypes.func.isRequired
 };
 
 StickersPlayer.propTypes = {

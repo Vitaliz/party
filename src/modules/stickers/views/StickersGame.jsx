@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import StickersView from '../components/StickersView';
@@ -8,8 +8,7 @@ import StickersLobby from '../panels/StickersLobby';
 import PopoutProvider from '../../../components/overlay/PopoutProvider';
 import ModalProvider from '../../../components/overlay/ModalProvider';
 
-import {useHistory} from '../../../hooks/router';
-import {useImmutableCallback} from '../../../hooks/base';
+import {useImmutableCallback, useEffect, useState} from '../../../hooks/base';
 import {/*useBridge,*/ useBus} from '../../../hooks/util';
 import {baseParams} from '../../../utils/uri';
 
@@ -29,7 +28,7 @@ const StickersGame = ({id}) => {
 
   let gameId = store.game.id ?? null;
 
-  const panels = useHistory('lobby');
+  const [panel, setPanel] = useState('lobby');
   const bus = useBus();
   const [game, setGame] = useState(null);
 
@@ -42,11 +41,10 @@ const StickersGame = ({id}) => {
       gameId: game.id,
       word: word
     }));
-    panels.setActivePanel('main');
+    setPanel('main');
   };
 
   const gotWord = () => {
-    console.log('word got');
     socket.emit('got-word', game.id);
   };
 
@@ -79,7 +77,6 @@ const StickersGame = ({id}) => {
       store.game.id = null;
     }
 
-
     socket.on('game-created', (msg) => {
       const {data} = msg;
       setGame(data);
@@ -93,13 +90,13 @@ const StickersGame = ({id}) => {
     socket.on('game-prepared', (msg) => {
       const {data} = msg;
       setGame(data);
-      panels.setActivePanel('prepare');
+      setPanel('prepare');
     });
 
     socket.on('game-restarted', (msg) => {
       const {data} = msg;
       setGame(data);
-      panels.setActivePanel('prepare');
+      setPanel('prepare');
     });
 
     socket.on('word-set', (msg) => {
@@ -119,16 +116,14 @@ const StickersGame = ({id}) => {
   return (
     <StickersView
       id={id}
-      activePanel={panels.activePanel}
-      history={panels.history}
-      onSwipeBack={panels.goBack}
+      activePanel={panel}
       modal={<ModalProvider/>}
       popout={<PopoutProvider/>}
       header={false}
     >
       <StickersLobby game={game} close={close} id="lobby" goForward={start}
         start={startTyping}/>
-      <StickersPrepare id="prepare" game={game} goBack={panels.goBack} start={setWord}/>
+      <StickersPrepare id="prepare" game={game} start={setWord}/>
       <StickersMain close={close} id="main" game={game} wordGot={gotWord} restartGame={restartGame}/>
     </StickersView>
   );

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import GradientPanel from '../../../components/panel/GradientPanel';
@@ -6,7 +6,9 @@ import ThemedButton from '../../../components/common/ThemedButton';
 
 import styled from 'styled-components/macro';
 import {parseQuery} from '../../../utils/uri';
-import {Avatar, Input} from '@vkontakte/vkui';
+import { Avatar, Input } from '@vkontakte/vkui';
+
+import {useState} from '../../../hooks/base';
 
 const Header = styled.div`
   display: flex;
@@ -35,7 +37,7 @@ const Content = styled.div`
  *
  * @param {Object} props
  */
-const StickersPrepare = ({id, game, goBack, start}) => {
+const StickersPrepare = ({id, game, start}) => {
   const [word, setWord] = useState(null);
   const [status, setStatus] = useState('default');
 
@@ -69,7 +71,6 @@ const StickersPrepare = ({id, game, goBack, start}) => {
   return (
     <GradientPanel
       id={id}
-      onBack={goBack}
       title="Подготовка"
       color="blue"
       postfix={(
@@ -103,7 +104,6 @@ const StickersPrepare = ({id, game, goBack, start}) => {
 StickersPrepare.propTypes = {
   id: PropTypes.string.isRequired,
   game: PropTypes.object.isRequired,
-  goBack: PropTypes.func.isRequired,
   start: PropTypes.func.isRequired,
 };
 
