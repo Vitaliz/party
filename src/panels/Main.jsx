@@ -6,6 +6,7 @@ import RichPanel from '../components/panel/RichPanel';
 import HorizontalScroll from '../components/common/HorizontalScroll';
 import Card from '../components/Card';
 import Subscribe from '../components/Subscribe';
+import QrScanner from '../components/QrScanner';
 
 import { useImmutableCallback } from '../hooks/base';
 
@@ -20,6 +21,13 @@ const MainTitle = styled.h1`
   text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
 
   margin: 0;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-content: center;
+  align-items: center;
 `;
 
 const MainHorizontalScroll = styled(HorizontalScroll)`
@@ -59,7 +67,12 @@ const Main = ({ id, goForward }) => {
     <RichPanel
       id={id}
       title="Party Games"
-      affix={<MainTitle>Во что сыграем?</MainTitle>}
+      affix={(
+        <MainTitle>
+          <span>Во что сыграем?</span>
+          <QrScanner />
+        </MainTitle>
+      )}
       postfix={<MainSubscribe />}
     >
       <MainHorizontalScroll>
