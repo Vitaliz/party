@@ -75,7 +75,7 @@ const Subscribe = (props) => {
     bridge.send('VKWebAppJoinGroup', {
       'group_id': APP_GROUP
     }).then((data) => {
-      store.user.is_follower = data && data.result;
+      store.user.isFollower = data && data.result;
       setFollower(store.user.isFollower);
     }).catch(() => {
       setFollower(false);
