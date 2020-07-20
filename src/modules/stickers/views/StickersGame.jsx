@@ -10,7 +10,7 @@ import ModalProvider from '../../../components/overlay/ModalProvider';
 
 import {useHistory} from '../../../hooks/router';
 import {useImmutableCallback} from '../../../hooks/base';
-import {useBus} from '../../../hooks/util';
+import {useBridge, useBus} from '../../../hooks/util';
 import {baseParams} from '../../../utils/uri';
 
 import io from 'socket.io-client';
@@ -25,7 +25,9 @@ const socket = io(URL_WS + '?vk-params=' + encodeURIComponent(baseParams(window.
 
 const StickersGame = ({id}) => {
   const store = useStore();
-  const gameId = store.game.id ?? null;
+  const bridge = useBridge();
+
+  let gameId = store.game.id ?? null;
 
   console.log('gd', Boolean(gameId));
 
@@ -52,8 +54,28 @@ const StickersGame = ({id}) => {
     socket.emit('got-word', game.id);
   };
 
-  useEffect(() => {
+  const restartGame = () => {
+    console.log('word got');
+    socket.emit('restart-game', game.id);
+  };
 
+  useEffect(() => {
+    const bridgeListener = (event) => {
+      console.log('EVENT', event.detail.type);
+      if (event.detail.type === 'VKWebAppViewRestore' && game) {
+        console.log('emit');
+        socket.emit('join-game', game.id);
+      }
+    };
+
+    bridge.subscribe(bridgeListener);
+
+    return () => {
+      bridge.unsubscribe(bridgeListener);
+    };
+  }, [game]);
+
+  useEffect(() => {
 
     console.log('on connect');
     if (!gameId) {
@@ -62,6 +84,8 @@ const StickersGame = ({id}) => {
     } else {
       console.log('join');
       socket.emit('join-game', gameId);
+      gameId = null;
+      store.game.id = null;
     }
 
 
@@ -82,6 +106,15 @@ const StickersGame = ({id}) => {
     socket.on('game-prepared', (msg) => {
       const {data} = msg;
       console.log('game prepared', data);
+
+      setGame(data);
+
+      panels.setActivePanel('prepare');
+    });
+
+    socket.on('game-restarted', (msg) => {
+      const {data} = msg;
+      console.log('game restarted', data);
 
       setGame(data);
 
@@ -114,10 +147,10 @@ const StickersGame = ({id}) => {
       popout={<PopoutProvider/>}
       header={false}
     >
-      <StickersLobby game={game} close={close} id="lobby" goForward={start} isCreator={!gameId}
-        start={startTyping}/>
+      <StickersLobby game={game} close={close} id="lobby" goForward={start}
+                     start={startTyping}/>
       <StickersPrepare id="prepare" game={game} goBack={panels.goBack} start={setWord}/>
-      <StickersMain close={close} id="main" game={game} wordGot={gotWord} />
+      <StickersMain close={close} id="main" game={game} wordGot={gotWord} restartGame={restartGame}/>
     </StickersView>
   );
 };

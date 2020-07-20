@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import PropTypes from 'prop-types';
 
 import GradientPanel from '../../../components/panel/GradientPanel';
@@ -11,7 +11,7 @@ import styled from 'styled-components/macro';
 import {useImmutableCallback} from '../../../hooks/base';
 import {useModal} from '../../../hooks/overlay';
 
-import {generateInviteLink} from '../../../utils/uri';
+import {generateInviteLink, parseQuery} from '../../../utils/uri';
 import UserBubbles from '../components/UserBubbles';
 
 
@@ -32,8 +32,24 @@ const Btn = styled.div`
  *
  * @param {Object} props
  */
-const StickersLobby = ({id, game, close, isCreator, start}) => {
+const StickersLobby = ({id, game, close, start}) => {
   const modal = useModal();
+
+  const isCreator = useMemo(() => {
+    if (!game) {
+      return false;
+    }
+    const query = parseQuery(window.location.search);
+    return +query.vk_user_id === game.creator.vkUserId;
+  }, game);
+
+  const isReadyToStart = useMemo(() => {
+    if (!game) {
+      return false;
+    }
+
+    return game.gameUsers.length >= 2;
+  }, [game]);
 
   const showQR = useImmutableCallback(() => {
     const link = generateInviteLink('stickers', game.id);
@@ -63,7 +79,7 @@ const StickersLobby = ({id, game, close, isCreator, start}) => {
                   Пригласить
                 </ThemedButton>
               </Btn>
-              <Btn>
+              {isReadyToStart && <Btn>
                 <ThemedButton
                   $color="blue"
                   $overlay={true}
@@ -71,7 +87,7 @@ const StickersLobby = ({id, game, close, isCreator, start}) => {
                 >
                   Начать
                 </ThemedButton>
-              </Btn>
+              </Btn>}
             </>
           )}
 
@@ -86,7 +102,6 @@ const StickersLobby = ({id, game, close, isCreator, start}) => {
 StickersLobby.propTypes = {
   id: PropTypes.string.isRequired,
   game: PropTypes.object.isRequired,
-  isCreator: PropTypes.bool.isRequired,
   close: PropTypes.func.isRequired,
   goForward: PropTypes.func.isRequired,
   start: PropTypes.func.isRequired
