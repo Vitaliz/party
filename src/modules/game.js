@@ -48,7 +48,8 @@ export default class Game {
         }],
         iceTransportPolicy: 'all',
         sdpSemantics: 'unified-plan',
-        bundlePolicy: 'max-compat'
+        bundlePolicy: 'max-compat',
+        rtcMuxPolicy: 'negotiate'
       }
     });
 
