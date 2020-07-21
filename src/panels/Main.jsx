@@ -9,8 +9,9 @@ import Subscribe from '../components/Subscribe';
 import QrScanner from '../components/QrScanner';
 
 import { useImmutableCallback } from '../hooks/base';
+import { useBridge } from '../hooks/util';
 
-import { SETTINGS } from '../utils/constants';
+import { SETTINGS, APP_GROUP } from '../utils/constants';
 
 const MainTitle = styled.h1`
   font-size: 26px;
@@ -47,6 +48,8 @@ const MainSubscribe = styled(Subscribe)`
 `;
 
 const Main = ({ id, goForward }) => {
+  const bridge = useBridge();
+
   const openStickers = useImmutableCallback(() => {
     goForward('stickers');
   });
@@ -55,12 +58,31 @@ const Main = ({ id, goForward }) => {
     goForward('alias');
   });
 
-  const openCroco = useImmutableCallback(() => {
-    goForward('croco');
-  });
+  // const openCroco = useImmutableCallback(() => {
+  //   goForward('croco');
+  // });
 
-  const openMafia = useImmutableCallback(() => {
-    goForward('mafia');
+  // const openMafia = useImmutableCallback(() => {
+  //   goForward('mafia');
+  // });
+
+  const subscribeNotifications = useImmutableCallback(() => {
+    if (bridge.supports('VKWebAppAllowNotifications')) {
+      bridge.send('VKWebAppAllowNotifications').catch(() => {
+        // ignore
+      });
+      return;
+    }
+
+    if (bridge.supports('VKWebAppAllowMessagesFromGroup')) {
+      bridge.send('VKWebAppAllowMessagesFromGroup', {
+        group_id: APP_GROUP,
+        key: 'vma'
+      }).catch(() => {
+        // ignore
+      });
+      return;
+    }
   });
 
   return (
@@ -82,6 +104,7 @@ const Main = ({ id, goForward }) => {
           description="Угадай, кто ты!"
           count={SETTINGS.stickers.count}
           time={SETTINGS.stickers.time}
+          action="Играть"
           callback={openStickers}
         />
         <Card
@@ -90,14 +113,16 @@ const Main = ({ id, goForward }) => {
           description="Объясняй слова!"
           count={SETTINGS.alias.count}
           time={SETTINGS.alias.time}
+          action="Играть"
           callback={openAlias}
         />
-        <Card
+        {/* <Card
           color="green"
           name="Крокодил"
           description="Показывай без слов!"
           count={SETTINGS.croco.count}
           time={SETTINGS.croco.time}
+          action="Играть"
           callback={openCroco}
         />
         <Card
@@ -106,7 +131,15 @@ const Main = ({ id, goForward }) => {
           description="Очисти город от мафии!"
           count={SETTINGS.mafia.count}
           time={SETTINGS.mafia.time}
+          action="Играть"
           callback={openMafia}
+        /> */}
+        <Card
+          color="pink"
+          name="Скоро"
+          description="Подпишись и получай уведомления о выходе новых игр первым."
+          action="Подписаться"
+          callback={subscribeNotifications}
         />
       </MainHorizontalScroll>
     </RichPanel>

@@ -62,7 +62,11 @@ export default class Game {
     });
     // wait open state
     this.peer.on('open', () => {
-      this.peer.on('connection', this.handleConnection.bind(this));
+      this.peer.on('connection', (connection) => {
+        this.handleConnection(connection, () => {
+          // TODO
+        });
+      });
 
       this.id = +this.peer.id;
 
@@ -78,7 +82,7 @@ export default class Game {
     this.bus.emit('init');
   }
 
-  subscribe(connection, callback) {
+  handleConnection(connection, callback) {
     // react to errors
     connection.on('error', this.handleError.bind(this));
     // wait open state
@@ -99,20 +103,12 @@ export default class Game {
     });
   }
 
-  handleConnection(connection, callback) {
-    this.subscribe(connection, () => {
-      if (typeof callback === 'function') {
-        callback(+connection.peer);
-      }
-    });
-  }
-
   connect(peerId) {
     // connect manually
     const connection = this.peer.connect(String(peerId));
 
     // subscribe
-    this.subscribe(connection, (peerId) => {
+    this.handleConnection(connection, (peerId) => {
       this.send(peerId, {
         signal: SIGNAL.HOST_WHO
       });
@@ -150,8 +146,8 @@ export default class Game {
   }
 
   _signalHostIs(peerId, data) {
-    if (+peerId === +data.payload) {
-      this.host = +peerId;
+    if (peerId === +data.payload) {
+      this.host = peerId;
 
       this._onInit();
 
@@ -159,12 +155,12 @@ export default class Game {
         signal: SIGNAL.META_REQUEST
       });
     } else {
-      this.handleConnection(this.peer.connect(String(peerId)));
+      this.connect(peerId);
     }
   }
 
   _signalMetaRequest(peerId) {
-    if (+peerId !== this.host) {
+    if (peerId !== this.host) {
       this.send(peerId, {
         signal: SIGNAL.META_REQUEST
       });
@@ -177,13 +173,21 @@ export default class Game {
   }
 
   _signalMetaResponse(peerId, data) {
-    this.meta.set(+peerId, data.payload);
+    this.meta.set(peerId, data.payload);
   }
 
   send(peerId, data) {
-    const connection = this.connections.get(+peerId);
-    if (connection) {
-      connection.send(data);
+    if (peerId === this.id) {
+      this.handleData(peerId, data);
+    } else {
+      let connection = this.connections.get(peerId);
+      if (connection) {
+        connection.send(data);
+      } else {
+        const err = new Error('Connection not established');
+        err.type = 'peer-unavailable';
+        this.handleError(err);
+      }
     }
   }
 
