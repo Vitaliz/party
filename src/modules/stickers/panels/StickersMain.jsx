@@ -7,6 +7,7 @@ import {Avatar} from '@vkontakte/vkui';
 import styled from 'styled-components/macro';
 import ThemedButton from '../../../components/common/ThemedButton';
 import Icon16Done from '@vkontakte/icons/dist/16/done';
+import Icon16Cancel from '@vkontakte/icons/dist/16/cancel';
 
 import {useMemo} from '../../../hooks/base';
 
@@ -53,13 +54,25 @@ const PlayerWord = styled.div`
 `;
 
 const StickersPlayer = ({gameUser, word}) => {
+
+  const renderBadge = () => {
+    if (gameUser.isFinished) {
+      return (<AvatarIcon><Icon16Done/></AvatarIcon>);
+    }
+
+    if (!gameUser.isOnline) {
+      return (<AvatarIcon><Icon16Cancel/></AvatarIcon>);
+    }
+
+    return null;
+  };
+
+
   return (
     <PlayerWrapper>
       <PlayerAvatar>
         <Avatar src={gameUser.user.avatar} size={72}/>
-        {gameUser.isFinished && (
-          <AvatarIcon><Icon16Done/></AvatarIcon>
-        )}
+        {renderBadge()}
       </PlayerAvatar>
       <PlayerWord>{word}</PlayerWord>
     </PlayerWrapper>
