@@ -9,7 +9,7 @@ import PopoutProvider from '../../../components/overlay/PopoutProvider';
 import ModalProvider from '../../../components/overlay/ModalProvider';
 
 import {useImmutableCallback, useEffect, useState} from '../../../hooks/base';
-import {/*useBridge,*/ useBus} from '../../../hooks/util';
+import {useBridge, useBus} from '../../../hooks/util';
 import {baseParams} from '../../../utils/uri';
 
 import io from 'socket.io-client';
@@ -24,7 +24,7 @@ const socket = io(URL_WS + '?vk-params=' + encodeURIComponent(baseParams(window.
 
 const StickersGame = ({id}) => {
   const store = useStore();
-  // const bridge = useBridge();
+  const bridge = useBridge();
 
   let gameId = store.game.id ?? null;
 
@@ -52,21 +52,22 @@ const StickersGame = ({id}) => {
     socket.emit('restart-game', game.id);
   };
 
-  // useEffect(() => {
-  //   const bridgeListener = (event) => {
-  //     console.log('EVENT', event.detail.type);
-  //     if (event.detail.type === 'VKWebAppViewRestore' && game) {
-  //       console.log('emit');
-  //       socket.emit('join-game', game.id);
-  //     }
-  //   };
+  useEffect(() => {
 
-  //   bridge.subscribe(bridgeListener);
+    if (game) {
+      const bridgeListener = (event) => {
+        if (event.detail.type === 'VKWebAppViewRestore') {
+          socket.emit('join-game', game.id);
+        }
+      };
 
-  //   return () => {
-  //     bridge.unsubscribe(bridgeListener);
-  //   };
-  // }, [game]);
+      bridge.subscribe(bridgeListener);
+
+      return () => {
+        bridge.unsubscribe(bridgeListener);
+      };
+    }
+  }, [game]);
 
   useEffect(() => {
     if (!gameId) {
@@ -106,6 +107,7 @@ const StickersGame = ({id}) => {
   }, []);
 
   const close = useImmutableCallback(() => {
+    setGame(null);
     bus.emit('app:view', 'home');
   });
 

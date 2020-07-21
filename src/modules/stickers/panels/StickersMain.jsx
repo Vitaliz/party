@@ -50,7 +50,7 @@ const StickersPlayer = ({gameUser, word}) => {
       <PlayerAvatar>
         <Avatar src={gameUser.user.avatar} size={72}/>
         {gameUser.isFinished && (
-          <AvatarIcon><Icon16Done /></AvatarIcon>
+          <AvatarIcon><Icon16Done/></AvatarIcon>
         )}
       </PlayerAvatar>
       <PlayerWord>{word}</PlayerWord>
@@ -64,7 +64,13 @@ const StickersPlayer = ({gameUser, word}) => {
  * @param {Object} props
  */
 const StickersMain = ({id, game, wordGot, restartGame, close}) => {
-  const gameUsers = game.gameUsers;
+  const gameUsers = useMemo(() => {
+    if (!game) {
+      return [];
+    }
+
+    return game.gameUsers;
+  }, [game]);
 
   const query = parseQuery(window.location.search);
 
@@ -74,7 +80,7 @@ const StickersMain = ({id, game, wordGot, restartGame, close}) => {
     }
     const query = parseQuery(window.location.search);
     return +query.vk_user_id === game.creator.vkUserId;
-  }, game);
+  }, [game]);
 
   const currentUser = gameUsers.find((gameUser) => {
     return gameUser.user.vkUserId === +query.vk_user_id;
@@ -95,19 +101,19 @@ const StickersMain = ({id, game, wordGot, restartGame, close}) => {
   return (
     <GradientPanel
       id={id}
-      title="Лобби"
-      onClose={game.finishedAt !== null && close}
+      title="Игра!"
+      onClose={(game && game.finishedAt) !== null && close}
       color="blue"
       postfix={(
         <div>
-          {!currentUser.isFinished && <ThemedButton
+          {(currentUser && !currentUser.isFinished) && <ThemedButton
             $color="blue"
             $overlay={true}
             onClick={wordGot}
           >
             Я угадал!
           </ThemedButton>}
-          {(isCreator && game.finishedAt !== null) && <ThemedButton
+          {(isCreator && game && game.finishedAt !== null) && <ThemedButton
             $color="blue"
             $overlay={true}
             onClick={restartGame}
