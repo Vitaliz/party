@@ -42,7 +42,7 @@ const StickersPrepare = ({id, game, start}) => {
   const [status, setStatus] = useState('default');
 
   const checkStart = () => {
-    if (!word || word.trim() === '') {
+    if (!word || word.length < 2 || word.length > 32) {
       setStatus('error');
       return;
     }
@@ -51,9 +51,11 @@ const StickersPrepare = ({id, game, start}) => {
   };
 
   const onInput = (e) => {
-    setWord(e.target.value);
+    const value = String(e.target.value).trim();
 
-    if (!word || word.trim() === '') {
+    setWord(value);
+
+    if (!value) {
       setStatus('error');
     } else {
       setStatus('default');
@@ -94,7 +96,14 @@ const StickersPrepare = ({id, game, start}) => {
           </HeaderUser>
         </Header>
         <Content>
-          <Input status={status} required={true} onInput={onInput} placeholder="Например: Оби Ван Кеноби"/>
+          <Input
+            status={status}
+            required={true}
+            onInput={onInput}
+            placeholder="Например: Оби Ван Кеноби"
+            minLength={2}
+            maxLength={32}
+          />
         </Content>
       </div>
     </GradientPanel>

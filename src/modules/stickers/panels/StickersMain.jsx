@@ -14,6 +14,7 @@ const PlayerWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 30px;
+  max-width: 100%;
 `;
 
 const AvatarIcon = styled.div`
@@ -42,6 +43,13 @@ const PlayerWord = styled.div`
   color: #3F8AE0;
   margin-left: 30px;
   border-radius: 10px;
+
+  overflow-wrap: normal;
+  word-break: normal;
+  word-wrap: normal;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const StickersPlayer = ({gameUser, word}) => {
