@@ -8,9 +8,9 @@ import StickersLobby from '../panels/StickersLobby';
 import PopoutProvider from '../../../components/overlay/PopoutProvider';
 import ModalProvider from '../../../components/overlay/ModalProvider';
 
-import {useImmutableCallback, useEffect, useState} from '../../../hooks/base';
+import {useImmutableCallback, useEffect, useState, useMemo} from '../../../hooks/base';
 import {useBridge, useBus} from '../../../hooks/util';
-import {baseParams} from '../../../utils/uri';
+import {baseParams, parseQuery} from '../../../utils/uri';
 
 import io from 'socket.io-client';
 import {useStore} from '../../../hooks/store';
@@ -31,6 +31,9 @@ const StickersGame = ({id}) => {
   const [panel, setPanel] = useState('lobby');
   const bus = useBus();
   const [game, setGame] = useState(null);
+
+  const query = parseQuery(window.location.search);
+
 
   const startTyping = () => {
     socket.emit('start-game-prepare', game.id);
@@ -86,6 +89,27 @@ const StickersGame = ({id}) => {
     socket.on('game-updated', (msg) => {
       const {data} = msg;
       setGame(data);
+
+      if (data.startedAt) {
+
+        const currentUser = data.gameUsers.find((gameUser) => {
+          return gameUser.user.vkUserId === +query.vk_user_id;
+        });
+
+        if (currentUser && currentUser.attachedGameUser) {
+
+          const attachedIndex = currentUser.attachedGameUser.index;
+
+          const attachedUser = data.gameUsers[attachedIndex];
+
+          if (attachedUser && !attachedUser.word) {
+            setPanel('prepare');
+          } else {
+            setPanel('main');
+          }
+        }
+      }
+
     });
 
     socket.on('game-prepared', (msg) => {
