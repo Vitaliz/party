@@ -6,25 +6,25 @@ export const SIGNAL = {
   HOST_WHO: 1,
   HOST_IS: 2,
 
-  META_REQUEST: 3,
-  META_RESPONSE: 4
+  META: 3,
+  CONNECT: 4
 };
 
 export default class Game {
-  constructor(user, host) {
-    this.id = null;
-
-    this._meta = user;
-    this._retry = 0;
+  constructor(meta, host) {
+    this.id = +meta.vkUserId;
 
     this.timer = null;
     this.bus = createBus();
     this.connections = new Map();
-    this.meta = new Map();
     this.sync = new Set();
 
+    this._meta = meta;
+    this.meta = new Map();
+    this.meta.set(this.id, this._meta);
+
     this.host = +host;
-    this.peer = new Peer(String(user.vkUserId), {
+    this.peer = new Peer(String(meta.vkUserId), {
       pingInterval: 1000,
       host: PEER_HOST,
       path: PEER_PATH,
@@ -54,26 +54,40 @@ export default class Game {
 
     // react to errors
     this.peer.on('error', this.handleError.bind(this));
+
     // simple reconnect
     this.peer.on('disconnected', () => {
       if (!this.peer.destroyed) {
         this.peer.reconnect();
       }
     });
+
     // wait open state
     this.peer.on('open', () => {
       this.peer.on('connection', (connection) => {
-        this.handleConnection(connection, () => {
-          // TODO
+        this.handleConnection(connection, (peerId) => {
+          // send meta
+          this.send(peerId, {
+            signal: SIGNAL.META,
+            payload: this._meta
+          });
+
+          // broadcast connect
+          if (this.id === this.host) {
+            this.broadcast({
+              signal: SIGNAL.CONNECT,
+              payload: peerId
+            });
+          }
         });
       });
 
-      this.id = +this.peer.id;
-
-      if (this.host !== this.id) {
-        this.connect(this.host);
-      } else {
+      if (this.id === this.host) {
+        // init immediately if host
         this._onInit();
+      } else {
+        // connect to host
+        this.connect(this.host);
       }
     });
   }
@@ -99,16 +113,37 @@ export default class Game {
       // save connection
       this.connections.set(+connection.peer, connection);
 
-      callback(+connection.peer);
+      // detach from event phase
+      window.setTimeout(() => {
+        // connection ready state
+        callback(+connection.peer);
+      }, 0);
     });
   }
 
   connect(peerId) {
+    if (peerId === this.id) {
+      // no need to connect to yourself
+      return;
+    }
+
+    if (this.connections.has(peerId)) {
+      // already connected
+      return;
+    }
+
     // connect manually
     const connection = this.peer.connect(String(peerId));
 
     // subscribe
     this.handleConnection(connection, (peerId) => {
+      // send meta
+      this.send(peerId, {
+        signal: SIGNAL.META,
+        payload: this._meta
+      });
+
+      // request for host
       this.send(peerId, {
         signal: SIGNAL.HOST_WHO
       });
@@ -129,11 +164,11 @@ export default class Game {
       case SIGNAL.HOST_IS:
         this._signalHostIs(peerId, data);
         break;
-      case SIGNAL.META_REQUEST:
-        this._signalMetaRequest(peerId);
+      case SIGNAL.META:
+        this._signalMeta(peerId, data);
         break;
-      case SIGNAL.META_RESPONSE:
-        this._signalMetaResponse(peerId, data);
+      case SIGNAL.CONNECT:
+        this._signalConnect(peerId, data);
         break;
     }
   }
@@ -146,34 +181,29 @@ export default class Game {
   }
 
   _signalHostIs(peerId, data) {
-    if (peerId === +data.payload) {
-      this.host = peerId;
-
+    if (peerId === data.payload) {
+      this.host = data.payload;
       this._onInit();
-
-      this.send(this.host, {
-        signal: SIGNAL.META_REQUEST
-      });
     } else {
-      this.connect(peerId);
+      this.connect(data.payload);
     }
   }
 
-  _signalMetaRequest(peerId) {
-    if (peerId !== this.host) {
-      this.send(peerId, {
-        signal: SIGNAL.META_REQUEST
-      });
-    }
-
-    this.send(peerId, {
-      signal: SIGNAL.META_RESPONSE,
-      payload: this._meta
-    });
-  }
-
-  _signalMetaResponse(peerId, data) {
+  _signalMeta(peerId, data) {
     this.meta.set(peerId, data.payload);
+    this.bus.emit('update');
+  }
+
+  _signalConnect(peerId, data) {
+    if (peerId === this.host) {
+      const isNeed =
+        data.payload !== this.id &&
+        data.payload !== this.host;
+
+      if (isNeed) {
+        this.connect(data.payload);
+      }
+    }
   }
 
   send(peerId, data) {
@@ -181,6 +211,7 @@ export default class Game {
       this.handleData(peerId, data);
     } else {
       let connection = this.connections.get(peerId);
+
       if (connection) {
         connection.send(data);
       } else {
@@ -192,13 +223,18 @@ export default class Game {
   }
 
   broadcast(data) {
+    // to self
+    this.send(this.id, data);
+
+    // to other
     this.connections.forEach((connection) => {
       connection.send(data);
     });
   }
 
   isSynchronized() {
-    return this.sync.size >= this.connections.size;
+    // (sync) gt or eq (other + self)
+    return this.sync.size >= (this.connections.size + 1);
   }
 
   attach(callback) {
@@ -231,9 +267,7 @@ export default class Game {
     this.connections.clear();
     this.connections = null;
 
-    this.meta.clear();
-    this.meta = null;
-
+    // clear sync
     this.sync.clear();
     this.sync = null;
 

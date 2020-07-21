@@ -51,9 +51,7 @@ const AliasJoin = ({ game, id, goBack, goForward }) => {
 
     const isJoined = game.settings.teams &&
       game.settings.teams.some((team) => {
-        return team.users.some((user) => {
-          return +user.vkUserId === game.id;
-        });
+        return team.peers.includes(game.id);
       });
 
     return isJoined;
@@ -77,10 +75,10 @@ const AliasJoin = ({ game, id, goBack, goForward }) => {
     if (!game.settings.teams) {
       return null;
     }
+
     return game.settings.teams.map((team) => {
-      const checked = team.users.some((user) => {
-        return +user.vkUserId === game.id;
-      });
+      const checked = team.peers.includes(game.id);
+
       return (
         <TeamCard
           key={team.name}

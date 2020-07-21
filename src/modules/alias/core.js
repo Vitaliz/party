@@ -1,7 +1,8 @@
 import Game from '../game';
 import { secondsToTime } from '../../utils/date';
+import { shuffle } from '../../utils/data';
 
-const DELTA_SYNC_TIME = 4; // 4s
+const DELTA_SYNC_TIME = 2; // 2s
 
 export const CORE_SIGNAL = {
   SETTINGS_REQUEST: 1001,
@@ -12,9 +13,6 @@ export const CORE_SIGNAL = {
 
   READY_REQUEST: 1005,
   READY_RESPONSE: 1006,
-
-  CONNECT_PEERS: 1007,
-  CONNECT_SYNC: 1008,
 
   STAGE_WAIT: 2001,
 
@@ -46,25 +44,39 @@ export const STAGE = {
 
 export default class Core extends Game {
   constructor(user, settings) {
+    // received creator or self
     const host = settings.creator || user.vkUserId;
     super(user, host);
 
     if (settings.teams) {
+      // reset team
       settings.teams.forEach((team) => {
         team.users = [];
+        team.peers = [];
         team.points = 0;
       });
     }
 
+    // immutable in game
     this.settings = settings;
-    this.current = {
-      iter: 0,
-      queue: 0,
-      points: 0,
-      peers: null,
-      peer: null
-    };
+
+    // current game stage
     this.stage = null;
+
+    // current game state
+    this.current = {
+      // current queue item
+      item: {
+        team: null,
+        peer: null
+      },
+
+      // game lap
+      lap: -1
+    };
+
+    // current queue
+    this.queue = [];
   }
 
   maxUsersInTeam() {
@@ -74,58 +86,86 @@ export default class Core extends Game {
     return Math.ceil((this.connections.size + 1) / this.settings.teams.length);
   }
 
+  getTeamByName(name) {
+    if (!this.settings.teams) {
+      return null;
+    }
+    return this.settings.teams.find((team) => {
+      return team.name === name;
+    });
+  }
+
   _onInit() {
     super._onInit();
     if (!this.settings.teams) {
+      // request settings from host
       this.send(this.host, {
         signal: CORE_SIGNAL.SETTINGS_REQUEST
       });
     }
   }
 
-  _onNext() {
-    const next = this._enqueue();
-
-    this.current.peer = next;
-    this.send(next, {
-      signal: CORE_SIGNAL.STAGE_GAME_ACTIVE
-    });
-  }
-
-  _onNextTeam() {
-    const next = this._enqueueTeam();
-
-    this.current.peers = next.users.map((user) => {
-      return +user.vkUserId;
-    });
-
-    this.current.peers.forEach((peerId) => {
-      this.send(peerId, {
-        signal: CORE_SIGNAL.STAGE_START
+  _createQueue() {
+    // [[{ team1, peer1 },{ team1, peer2 }], [{ team2, peer1 }]]
+    const rawQueue = this.settings.teams.map((team) => {
+      return team.peers.map((peerId) => {
+        return {
+          team: team.name,
+          peer: peerId
+        };
       });
     });
+
+    let needAlignQueue = false;
+
+    const maxTeamLength = rawQueue.reduce((acc, teamQueue) => {
+      if (teamQueue.length > acc) {
+        if (acc > 0) {
+          needAlignQueue = true;
+        }
+
+        acc = teamQueue.length;
+      }
+      return acc;
+    }, 0);
+
+    // [[{ team1, peer1 },{ team1, peer2 }], [{ team2, peer1 },{ team2, peer1 }]]
+    if (needAlignQueue) {
+      // add queue item for each unaligned team
+      rawQueue.forEach((teamQueue) => {
+        while (teamQueue.length < maxTeamLength) {
+          const randomQueue = shuffle(teamQueue);
+          const alignLength = maxTeamLength - teamQueue.length;
+          teamQueue.push(...randomQueue.slice(0, alignLength));
+        }
+      });
+    }
+
+    // [{ team1, peer1 },{ team2, peer1 },{ team1, peer2 },{ team2, peer1 }]
+    const flatQueue = [];
+    for (let p = 0; p < maxTeamLength; ++p) {
+      for (let t = 0; t < rawQueue.length; ++t) {
+        flatQueue.push(rawQueue[t][p]);
+      }
+    }
+
+    // [{ team2, peer1 },{ team1, peer2 },{ team2, peer1 },{ team1, peer1 }]
+    const queue = flatQueue.reverse();
+
+    return queue;
   }
 
   _enqueue() {
-    const iter = this.current.iter;
-
-    ++this.current.iter;
-    if (this.current.iter >= this.current.peers.length) {
-      this.current.iter = 0;
+    // ensure that queue is not empty
+    if (this.queue.length === 0) {
+      this.queue = this._createQueue();
     }
 
-    return this.current.peers[iter];
-  }
+    // next lap
+    this.lap += 1;
 
-  _enqueueTeam() {
-    const iter = this.current.queue;
-
-    ++this.current.queue;
-    if (this.current.queue >= this.settings.teams.length) {
-      this.current.iter = 0;
-    }
-
-    return this.settings.teams[iter];
+    // next item
+    this.current.item = this.queue.pop();
   }
 
   join(name) {
@@ -136,27 +176,8 @@ export default class Core extends Game {
   }
 
   ready() {
-    if (this.host !== this.id) {
-      this.send(this.host, {
-        signal: CORE_SIGNAL.READY_REQUEST
-      });
-    } else {
-      if (this.isSynchronized()) {
-        const peers = Array.from(this.sync);
-        this.sync.clear();
-
-        this.broadcast({
-          signal: CORE_SIGNAL.CONNECT_PEERS,
-          payload: peers
-        });
-      }
-    }
-  }
-
-  wait() {
-    this._signalStageWait(this.id);
-    this.broadcast({
-      signal: CORE_SIGNAL.STAGE_WAIT
+    this.send(this.host, {
+      signal: CORE_SIGNAL.READY_REQUEST
     });
   }
 
@@ -164,12 +185,27 @@ export default class Core extends Game {
     this.send(this.host, {
       signal: CORE_SIGNAL.STAGE_START_SYNC
     });
+
+    this.timer = window.setTimeout(() => {
+      if (this.stage !== STAGE.END) {
+        this.send(this.host, {
+          signal: CORE_SIGNAL.STAGE_GAME_TIMEOUT
+        });
+      }
+    }, secondsToTime(this.settings.time));
   }
 
   points(points) {
+    const team = this.settings.teams.find((team) => {
+      return team.peers.includes(this.id);
+    });
+
     this.send(this.host, {
       signal: CORE_SIGNAL.POINTS,
-      payload: points
+      payload: {
+        team: team.name,
+        points
+      }
     });
   }
 
@@ -191,13 +227,7 @@ export default class Core extends Game {
         this._signalReadyRequest(peerId);
         break;
       case CORE_SIGNAL.READY_RESPONSE:
-        this._signalReadyRespone(peerId);
-        break;
-      case CORE_SIGNAL.CONNECT_PEERS:
-        this._signalConnectPeers(peerId, data);
-        break;
-      case CORE_SIGNAL.CONNECT_SYNC:
-        this._signalConnectSync(peerId);
+        this._signalReadyResponse(peerId);
         break;
       case CORE_SIGNAL.STAGE_WAIT:
         this._signalStageWait(peerId);
@@ -239,14 +269,23 @@ export default class Core extends Game {
   }
 
   _signalPoints(peerId, data) {
-    if (this.current.peers.includes(peerId)) {
-      const team = this.settings.teams.find((team) => {
-        return team.users.some((user) => {
-          return +user.vkUserId === peerId;
-        });
-      });
-      if (team) {
-        team.points += data.payload;
+    if (this.id === this.host) {
+      const trust =
+        this.current.item.peer === peerId &&
+        this.current.item.team === data.payload.name;
+
+      if (trust) {
+        const team = this.getTeamByName(data.payload.name);
+        if (team) {
+          team.points += data.payload.points;
+        }
+      }
+    } else {
+      if (peerId === this.host) {
+        const team = this.getTeamByName(data.payload.name);
+        if (team) {
+          team.points = data.payload.points;
+        }
       }
     }
   }
@@ -266,42 +305,44 @@ export default class Core extends Game {
   }
 
   _signalStageStartSync(peerId) {
-    this.sync.add(peerId);
+    if (this.id === this.host) {
+      const trust = this.current.item.peer === peerId;
+      if (trust) {
+        this.sync.add(peerId);
 
-    if (this.sync.size >= this.current.peers.length) {
-      this.timer = window.setTimeout(() => {
-        this._signalStageGameTimeout();
-      }, secondsToTime(this.settings.time + DELTA_SYNC_TIME));
+        if (this.sync.size >= this.current.peers.length) {
+          const team = this.getTeamByName(this.current.item.team);
 
-      this.current.peers.forEach((peer) => {
-        this.send(peer, {
-          signal: CORE_SIGNAL.STAGE_GAME
-        });
-      });
+          team.peers.forEach((peerId) => {
+            if (peerId === this.current.peer) {
+              this.send(peerId, {
+                signal: CORE_SIGNAL.STAGE_GAME
+              });
+            } else {
+              this.send(peerId, {
+                signal: CORE_SIGNAL.STAGE_MEMBER
+              });
+            }
+          });
+
+          this.timer = window.setTimeout(() => {
+            this.send(this.host, {
+              signal: CORE_SIGNAL.STAGE_GAME_TIMEOUT
+            });
+          }, secondsToTime(this.settings.time + DELTA_SYNC_TIME));
+        }
+      }
     }
   }
 
   _signalStageGameTimeout(peerId) {
-    window.clearTimeout(this.timer);
-
-    if (this.id === this.host) {
-      this.broadcast({
-        signal: CORE_SIGNAL.SETTINGS_RESPONSE,
-        payload: this.settings
-      });
-      this.state.current.peers.forEach((peer) => {
-        if (peer === this.id) {
-          this._signalStageEnd(this.id);
-        } else {
-          this.send(peer, {
-            signal: CORE_SIGNAL.STAGE_END
-          });
-        }
-      });
-    } else {
-      if (peerId === this.host) {
-        this.stage = STAGE.WAIT;
-        this.bus.emit('update');
+    const trust = peerId === this.current.item.peer || peerId === this.host;
+    if (trust) {
+      window.clearTimeout(this.timer);
+      if (this.id === this.host) {
+        this.send(this.current.item.peer, {
+          signal: CORE_SIGNAL.STAGE_END
+        });
       }
     }
   }
@@ -357,39 +398,6 @@ export default class Core extends Game {
     }
   }
 
-  _signalConnectSync(peerId) {
-    this.sync.add(peerId);
-
-    if (this.isSynchronized()) {
-      this.wait();
-    }
-  }
-
-  _signalConnectPeers(peerId, data) {
-    const exclude = [this.id, this.host, peerId];
-    const peers = data.payload.filter((peer) => {
-      return !exclude.includes(peer);
-    });
-    if (peers.length === 0) {
-      this.send(this.host, {
-        signal: CORE_SIGNAL.CONNECT_SYNC
-      });
-    } else {
-      peers.forEach((peer) => {
-        const connection = this.peer.connect(String(peer));
-        this.handleConnection(connection, (peerId) => {
-          this.sync.add(peerId);
-
-          if (this.isSynchronized()) {
-            this.send(this.host, {
-              signal: CORE_SIGNAL.CONNECT_SYNC
-            });
-          }
-        });
-      });
-    }
-  }
-
   _signalReadyRequest(peerId) {
     this.sync.add(peerId);
     this.bus.emit('update');
@@ -400,7 +408,17 @@ export default class Core extends Game {
   }
 
   _signalReadyResponse(peerId) {
-    this.sync.add(peerId);
+    if (this.id === this.host) {
+      this.sync.add(peerId);
+
+      if (this.isSynchronized()) {
+        this.sync.clear();
+
+        this.broadcast({
+          signal: CORE_SIGNAL.STAGE_WAIT
+        });
+      }
+    }
   }
 
   _signalSettingsRequest(peerId) {
@@ -424,13 +442,11 @@ export default class Core extends Game {
     const team = this.settings.teams.find((team) => {
       return team.name === data.payload;
     });
-    if (!team || !team.users) {
+    if (!team || !team.users || !team.peers) {
       return false;
     }
 
-    const isAlreadyJoined = team.users.some((user) => {
-      return +user.vkUserId === peerId;
-    });
+    const isAlreadyJoined = team.peers.includes(peerId);
     if (isAlreadyJoined) {
       return false;
     }
@@ -453,18 +469,13 @@ export default class Core extends Game {
     };
 
     if (success) {
-      // to other
+      // success for all
       this.broadcast({
         signal: CORE_SIGNAL.JOIN_RESPONSE,
         payload
       });
-
-      // to self
-      this.send(this.id, {
-        signal: CORE_SIGNAL.JOIN_RESPONSE,
-        payload
-      });
     } else {
+      // fail to peer
       this.send(peerId, {
         signal: CORE_SIGNAL.JOIN_RESPONSE,
         payload
@@ -480,23 +491,24 @@ export default class Core extends Game {
           team.points = 0;
 
           if (team.name === payload.name) {
-            const user = this.id === payload.peerId ?
-              this.meta : this.meta.get(payload.peerId);
+            const user = this.meta.get(payload.peerId);
 
-            team.users = [
-              ...team.users,
-              user
-            ];
+            team.peers.push(payload.peerId);
+            team.users.push(user);
           } else {
-            team.users = team.users.filter((user) => {
-              return user.vkUserId !== payload.peerId;
-            });
+            const index = team.peers.indexOf(payload.peerId);
+
+            if (index !== -1) {
+              team.peers.splice(index, 1);
+              team.users.splice(index, 1);
+            }
           }
         });
         this.bus.emit('update');
       } else {
-        // TODO: show error or something else
-        console.error('join reject');
+        const err = new Error('Cannot join');
+        err.type = 'join';
+        this.handleError(err);
       }
     }
   }
