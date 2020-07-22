@@ -8,9 +8,9 @@ import StickersLobby from '../panels/StickersLobby';
 import PopoutProvider from '../../../components/overlay/PopoutProvider';
 import ModalProvider from '../../../components/overlay/ModalProvider';
 
-import {useImmutableCallback, useEffect, useState} from '../../../hooks/base';
-import {/*useBridge,*/ useBus} from '../../../hooks/util';
-import {baseParams} from '../../../utils/uri';
+import {useImmutableCallback, useEffect, useState, useMemo} from '../../../hooks/base';
+import {useBridge, useBus} from '../../../hooks/util';
+import {baseParams, parseQuery} from '../../../utils/uri';
 
 import io from 'socket.io-client';
 import {useStore} from '../../../hooks/store';
@@ -24,13 +24,16 @@ const socket = io(URL_WS + '?vk-params=' + encodeURIComponent(baseParams(window.
 
 const StickersGame = ({id}) => {
   const store = useStore();
-  // const bridge = useBridge();
+  const bridge = useBridge();
 
   let gameId = store.game.id ?? null;
 
   const [panel, setPanel] = useState('lobby');
   const bus = useBus();
   const [game, setGame] = useState(null);
+
+  const query = parseQuery(window.location.search);
+
 
   const startTyping = () => {
     socket.emit('start-game-prepare', game.id);
@@ -52,21 +55,22 @@ const StickersGame = ({id}) => {
     socket.emit('restart-game', game.id);
   };
 
-  // useEffect(() => {
-  //   const bridgeListener = (event) => {
-  //     console.log('EVENT', event.detail.type);
-  //     if (event.detail.type === 'VKWebAppViewRestore' && game) {
-  //       console.log('emit');
-  //       socket.emit('join-game', game.id);
-  //     }
-  //   };
+  useEffect(() => {
 
-  //   bridge.subscribe(bridgeListener);
+    if (game) {
+      const bridgeListener = (event) => {
+        if (event.detail.type === 'VKWebAppViewRestore') {
+          socket.emit('join-game', game.id);
+        }
+      };
 
-  //   return () => {
-  //     bridge.unsubscribe(bridgeListener);
-  //   };
-  // }, [game]);
+      bridge.subscribe(bridgeListener);
+
+      return () => {
+        bridge.unsubscribe(bridgeListener);
+      };
+    }
+  }, [game]);
 
   useEffect(() => {
     if (!gameId) {
@@ -85,6 +89,27 @@ const StickersGame = ({id}) => {
     socket.on('game-updated', (msg) => {
       const {data} = msg;
       setGame(data);
+
+      if (data.startedAt) {
+
+        const currentUser = data.gameUsers.find((gameUser) => {
+          return gameUser.user.vkUserId === +query.vk_user_id;
+        });
+
+        if (currentUser && currentUser.attachedGameUser) {
+
+          const attachedIndex = currentUser.attachedGameUser.index;
+
+          const attachedUser = data.gameUsers[attachedIndex];
+
+          if (attachedUser && !attachedUser.word) {
+            setPanel('prepare');
+          } else {
+            setPanel('main');
+          }
+        }
+      }
+
     });
 
     socket.on('game-prepared', (msg) => {
@@ -107,6 +132,10 @@ const StickersGame = ({id}) => {
 
   const close = useImmutableCallback(() => {
     bus.emit('app:view', 'home');
+    if (game) {
+      socket.emit('leave', game.id);
+    }
+    setGame(null);
   });
 
   const start = useImmutableCallback(() => {
@@ -123,7 +152,7 @@ const StickersGame = ({id}) => {
     >
       <StickersLobby game={game} close={close} id="lobby" goForward={start}
         start={startTyping}/>
-      <StickersPrepare id="prepare" game={game} start={setWord}/>
+      <StickersPrepare close={close} id="prepare" game={game} start={setWord}/>
       <StickersMain close={close} id="main" game={game} wordGot={gotWord} restartGame={restartGame}/>
     </StickersView>
   );

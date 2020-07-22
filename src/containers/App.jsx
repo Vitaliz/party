@@ -73,6 +73,7 @@ const App = () => {
         }
       } else if (hashV4) {
         if (bridge.supports('VKWebAppSetLocation')) {
+          window.location.hash = '';
           bridge.send('VKWebAppSetLocation', {
             location: ''
           }).catch(() => {
