@@ -41,7 +41,7 @@ const Alias = ({ id, goBack }) => {
           <RoundButton onClick={openRules}>Правила</RoundButton>
         </Affix>
       )}
-      postfix="Скоро"
+      postfix="Начать"
       disabled={false}
     >
       Алиас — классика настольных игр
