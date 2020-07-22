@@ -45,8 +45,13 @@ const AliasJoin = ({ game, id, goBack, goForward }) => {
       const peersCount = game.connections.size;
       const usersCount = peersCount + 1;
 
-      const isMinimal = usersCount >= game.settings.teams.length;
+      const isMinimal = usersCount >= 4;
       if (!isMinimal) {
+        return false;
+      }
+
+      const isMinimalTeam = usersCount >= game.settings.teams.length;
+      if (!isMinimalTeam) {
         return false;
       }
 

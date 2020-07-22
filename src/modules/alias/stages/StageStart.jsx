@@ -9,7 +9,7 @@ import TeamAffix from '../components/TeamAffix';
 import Counter from '../../../components/Counter';
 import MirrorHill from '../../../components/MirrorHill';
 
-import { useCompute } from '../../../hooks/base';
+import { useState, useCompute } from '../../../hooks/base';
 
 import Core from '../core';
 
@@ -20,6 +20,8 @@ import Core from '../core';
  * @param {Core} props.game
  */
 const StageStart = ({ game }) => {
+  const [isClicked, setClickedState] = useState(false);
+
   const teams = useCompute(() => {
     if (!game.settings.teams) {
       return null;
@@ -57,6 +59,7 @@ const StageStart = ({ game }) => {
   });
 
   const startGame = () => {
+    setClickedState(true);
     game.start();
   };
 
@@ -81,6 +84,7 @@ const StageStart = ({ game }) => {
           <ThemedButton
             $color="yellow"
             $overlay={true}
+            disabled={isClicked}
             onClick={startGame}
           >
             Начать

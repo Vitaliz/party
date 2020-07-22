@@ -70,7 +70,10 @@ class DraggableCard extends Component {
       this.props[`onOutScreen${direction}`](this.props.index);
     } else {
       this.resetPosition();
-      this.setState({ animation: true });
+      this.setState({
+        animation: true,
+        hide: false
+      });
     }
   }
 

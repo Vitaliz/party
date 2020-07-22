@@ -59,8 +59,14 @@ const UnifiedCard = styled(Card)`
   position: absolute;
   overflow: hidden;
 
+  word-break: break-word;
+  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
+
   width: 288px;
   height: 288px;
+
+  padding: 12px;
 
   border: 1px solid #e6e6e6;
   box-sizing: border-box;
@@ -74,12 +80,13 @@ const UnifiedCard = styled(Card)`
   will-change: transform;
   backface-visibility: hidden;
 
-  &.animate {
-    transition: transform .3s ease-out, opacity .3s ease-out;
-  }
-
   &.hide {
     opacity: 0.2;
+  }
+
+  &.animate {
+    opacity: 1;
+    transition: transform .3s ease-out, opacity .3s ease-out;
   }
 `;
 

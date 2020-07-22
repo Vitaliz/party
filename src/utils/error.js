@@ -76,7 +76,7 @@ export default function sendError(morph = window.event, raw, source) {
   }
 
   if (process.env.NODE_ENV === 'production') {
-    return unaxios.post('/vk-user/error-log', { payload: `${pkg.version}\r\n${send.payload}` }).then(() => {
+    return unaxios.post('/vkma/error-log', { payload: `${pkg.version}\r\n${send.payload}` }).then(() => {
       return send;
     });
   } else {

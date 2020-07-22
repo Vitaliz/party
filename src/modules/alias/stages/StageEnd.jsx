@@ -10,7 +10,7 @@ import TeamAffix from '../components/TeamAffix';
 import Counter from '../../../components/Counter';
 import MirrorHill from '../../../components/MirrorHill';
 
-import { useCompute } from '../../../hooks/base';
+import { useState, useCompute } from '../../../hooks/base';
 
 import Core from '../core';
 
@@ -26,6 +26,8 @@ const AnswersContainer = styled.div`
  * @param {Core} props.game
  */
 const StageEnd = ({ game }) => {
+  const [isClicked, setClickedState] = useState(false);
+
   const answers = useCompute(() => {
     return game.answers.map((answer) => {
       return (
@@ -73,6 +75,7 @@ const StageEnd = ({ game }) => {
   });
 
   const endGame = () => {
+    setClickedState(true);
     game.end(points);
   };
 
@@ -94,6 +97,7 @@ const StageEnd = ({ game }) => {
           <ThemedButton
             $color="yellow"
             $overlay={true}
+            disabled={isClicked}
             onClick={endGame}
           >
             Закончить

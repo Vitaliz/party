@@ -14,7 +14,7 @@ import Core from '../core';
 const StageViewer = ({ game }) => {
   return (
     <AliasPostfix
-      description="Сейчас играет"
+      description="Сейчас играют"
     >
       {game.current.item.team}
     </AliasPostfix>

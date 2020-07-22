@@ -7,7 +7,7 @@ import StageViewer from '../modules/alias/stages/StageViewer';
 import StageMember from '../modules/alias/stages/StageMember';
 
 const GAME_MOCK = {
-  stage: STAGE.MEMBER,
+  stage: STAGE.GAME,
   answers: [
     {
       success: true,

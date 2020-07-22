@@ -1,4 +1,5 @@
 import Game from '../game';
+import unaxios from '../../utils/unaxios';
 import { secondsToTime } from '../../utils/date';
 import { shuffle } from '../../utils/data';
 
@@ -82,6 +83,30 @@ export default class Core extends Game {
 
     // current points
     this.answers = [];
+
+    // questions
+    this.questions = [];
+    this.fetchQuestions();
+  }
+
+  fetchQuestions() {
+    const fetch = () => {
+      const count = this.settings.point * 2;
+      unaxios.get(`/vkma/alias/words?count=${count}`).then((response) => {
+        this.questions = response.data.map((word) => {
+          return word.value;
+        });
+
+        this.bus.emit('update');
+        this.bus.emit('questions');
+      });
+    };
+
+    if (this.settings.point) {
+      fetch();
+    } else {
+      this.bus.once('settings', fetch);
+    }
   }
 
   maxUsersInTeam() {
@@ -232,9 +257,17 @@ export default class Core extends Game {
   }
 
   ready() {
-    this.send(this.host, {
-      signal: CORE_SIGNAL.READY_REQUEST
-    });
+    const ready = () => {
+      this.send(this.host, {
+        signal: CORE_SIGNAL.READY_REQUEST
+      });
+    };
+
+    if (!this.questions || this.questions.length === 0) {
+      this.bus.once('questions', ready);
+    } else {
+      ready();
+    }
   }
 
   start() {
@@ -333,7 +366,7 @@ export default class Core extends Game {
 
   _signalPoints(peerId, data) {
     if (peerId === this.host) {
-      const team = this.getTeamByName(data.payload.name);
+      const team = this.getTeamByName(data.payload.team);
       if (team) {
         team.points = data.payload.points;
         this.bus.emit('update');
@@ -343,8 +376,10 @@ export default class Core extends Game {
 
   _signalStageWait(peerId) {
     if (peerId === this.host) {
-      this.stage = STAGE.WAIT;
-      this.bus.emit('update');
+      if (this.stage === null || this.stage === STAGE.WAIT) {
+        this.stage = STAGE.WAIT;
+        this.bus.emit('update');
+      }
     }
   }
 
@@ -414,7 +449,7 @@ export default class Core extends Game {
         signal: CORE_SIGNAL.POINTS,
         payload: {
           team: team.name,
-          points: data.payload
+          points: team.points
         }
       });
 
@@ -485,6 +520,7 @@ export default class Core extends Game {
         ...this.settings,
         ...data.payload
       };
+      this.bus.emit('settings');
       this.bus.emit('update');
     }
   }

@@ -50,13 +50,19 @@ const StageResult = ({ game }) => {
   });
 
   const currentTeam = useCompute(() => {
-    if (!this.settings.teams) {
+    if (!game.settings.teams) {
       return null;
     }
 
-    return this.settings.teams.find((team) => {
-      return team.points === game.settings.point;
+    const team = game.settings.teams.find((team) => {
+      return team.points >= game.settings.point;
     });
+
+    if (!team) {
+      return null;
+    }
+
+    return team.name;
   });
 
   const isHost = useCompute(() => {
