@@ -8,16 +8,16 @@ const MirrorHillContainer = styled.div`
   position: relative;
 
   margin-top: 140px;
-  margin-bottom: 140px;
+  margin-bottom: 0;
 
   @media (min-width: 400px) {
     margin-top: 158px;
-    margin-bottom: 158px;
+    margin-bottom: 18px;
   }
 
   @media (min-width: 450px) {
     margin-top: 176px;
-    margin-bottom: 176px;
+    margin-bottom: 36px;
   }
 
   &.MirrorHillContainer--ios {
@@ -49,11 +49,21 @@ const MirrorHillContainer = styled.div`
       margin-right: calc(216px - 50vw);
     }
   }
+
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    z-index: -1;
+    background-color: #fff;
+    top: -36px;
+    left: -50%;
+    width: 200%;
+    height: calc(100% - 64px);
+  }
 `;
 
 const MirrorHillContent = styled(Div)`
-  background-color: #fff;
-
   position: relative;
   z-index: 2;
 
@@ -67,6 +77,15 @@ const MirrorHillContent = styled(Div)`
 
   top: -64px;
   bottom: -64px;
+
+  min-height: 72px;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-content: stretch;
+  align-items: stretch;
 
   @media (min-width: 482px) {
     padding: 0;

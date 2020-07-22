@@ -2,15 +2,16 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ThemedButton from '../../../components/common/ThemedButton';
+import { FixedLayout, Div } from '@vkontakte/vkui';
 import AliasAffix from '../components/AliasAffix';
+import AliasPostfix from '../components/AliasPostfix';
 import TeamAffix from '../components/TeamAffix';
 import Counter from '../../../components/Counter';
 import MirrorHill from '../../../components/MirrorHill';
 
-import { useCompute } from '../../../hooks/base';
+import { useState, useCompute } from '../../../hooks/base';
 
 import Core from '../core';
-import { FixedLayout, Div } from '@vkontakte/vkui';
 
 /**
  * Stage default
@@ -19,6 +20,8 @@ import { FixedLayout, Div } from '@vkontakte/vkui';
  * @param {Core} props.game
  */
 const StageStart = ({ game }) => {
+  const [isClicked, setClickedState] = useState(false);
+
   const teams = useCompute(() => {
     if (!game.settings.teams) {
       return null;
@@ -36,7 +39,27 @@ const StageStart = ({ game }) => {
     });
   });
 
+  const currentTeam = useCompute(() => {
+    return game.current.item.team;
+  });
+
+  const currentRound = useCompute(() => {
+    if (!game.settings.teams) {
+      return null;
+    }
+
+    const oneLoop = game.settings.teams.reduce((acc, team) => {
+      return acc + team.peers.length;
+    }, 0);
+
+    const round = Math.floor(game.current.lap % oneLoop) + 1;
+    const loop = Math.floor(game.current.lap / oneLoop) + 1;
+
+    return `Раунд ${round} \\ Круг ${loop}`;
+  });
+
   const startGame = () => {
+    setClickedState(true);
     game.start();
   };
 
@@ -49,11 +72,19 @@ const StageStart = ({ game }) => {
       <MirrorHill>
         {teams}
       </MirrorHill>
-      <FixedLayout>
+      <AliasPostfix
+        description={currentRound}
+      >
+        {currentTeam}
+      </AliasPostfix>
+      <FixedLayout
+        vertical="bottom"
+      >
         <Div>
           <ThemedButton
             $color="yellow"
             $overlay={true}
+            disabled={isClicked}
             onClick={startGame}
           >
             Начать

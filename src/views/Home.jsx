@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import { View } from '@vkontakte/vkui';
 
+import Preview from '../panels/Preview';
+
 import Main from '../panels/Main';
 import Alias from '../panels/Alias';
 import Stickers from '../panels/Stickers';
@@ -27,6 +29,9 @@ const Home = ({ id }) => {
       popout={<PopoutProvider />}
       header={false}
     >
+      <Preview
+        id="preview"
+      />
       <Main
         id="main"
         goForward={panels.goForward}

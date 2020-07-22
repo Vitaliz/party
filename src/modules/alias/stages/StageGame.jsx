@@ -1,18 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Countdown from 'react-countdown';
 import Cards from '../components/Cards';
+import AliasAffix from '../components/AliasAffix';
+import Timer from '../../../components/Timer';
 
-import { useState, useUnmount } from '../../../hooks/base';
+import { useCompute, useMemo, useForceUpdate } from '../../../hooks/base';
+
+import { secondsToTime } from '../../../utils/date';
 
 import Core from '../core';
-
-const CARDS_MOCK = [
-  '1',
-  '2',
-  '3',
-  '4'
-];
 
 /**
  * Stage game
@@ -21,34 +19,69 @@ const CARDS_MOCK = [
  * @param {Core} props.game
  */
 const StageGame = ({ game }) => {
-  const [cards, setCards] = useState(() => CARDS_MOCK);
-  const [points, setPoints] = useState(0);
+  const update = useForceUpdate();
 
-  useUnmount(() => {
-    game.points(points);
+  const cards = useCompute(() => {
+    return game.questions;
   });
 
-  const onAccept = () => {
-    setPoints((points) => points + 1);
+  const saveAnswer = (name, success) => {
+    game.answers.push({
+      name,
+      success
+    });
+    update();
   };
 
-  const onDismiss = () => {
-    if (game.settings.away) {
-      setPoints((points) => points - 1);
-    }
+  const onAccept = (name) => {
+    saveAnswer(name, true);
   };
 
-  const resetCards = () => {
-    setCards([...CARDS_MOCK]);
+  const onDismiss = (name) => {
+    saveAnswer(name, false);
   };
+
+  const count = useCompute(() => {
+    const team = game.settings.teams.find((team) => {
+      return team.peers.includes(game.id);
+    });
+    const before = team.points;
+    const points = game.answers.reduce((acc, answer) => {
+      if (answer.success) {
+        ++acc;
+      } else {
+        if (game.settings.away) {
+          --acc;
+        }
+      }
+      return acc;
+    }, 0);
+    const current = points < 0 ? 0 : points;
+    const total = before + current;
+
+    return `${total} \\ ${game.settings.point}`;
+  });
+
+  const time = useMemo(() => {
+    return Date.now() + secondsToTime(game.settings.time);
+  }, [game]);
 
   return (
-    <Cards
-      cards={cards}
-      onAccept={onAccept}
-      onDismiss={onDismiss}
-      onDone={resetCards}
-    />
+    <>
+      <AliasAffix>
+        <Countdown
+          key={game.id}
+          renderer={Timer}
+          date={time}
+        />
+        <span>{count}</span>
+      </AliasAffix>
+      <Cards
+        cards={cards}
+        onAccept={onAccept}
+        onDismiss={onDismiss}
+      />
+    </>
   );
 };
 

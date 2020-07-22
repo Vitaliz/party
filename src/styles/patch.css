@@ -22,7 +22,7 @@ img {
 }
 
 .Button--str + .Button--str {
-  margin-left: 8px;
+  margin-left: 12px;
 }
 
 .Button--sz-xl .Button__content {

@@ -42,7 +42,7 @@ const Alias = ({ id, goBack }) => {
         </Affix>
       )}
       postfix="Скоро"
-      disabled={true}
+      disabled={false}
     >
       Алиас — классика настольных игр
       по объяснению слов. Каждый из
