@@ -3,16 +3,19 @@ import PropTypes from 'prop-types';
 
 import Cards from '../components/Cards';
 
-import { useState, useUnmount } from '../../../hooks/base';
-
 import Core from '../core';
 
-const CARDS_MOCK = [
+const CARDS_MOCK1 = [
   '1',
   '2',
   '3',
-  '4'
+  '4',
+  '9',
+  '10',
+  '11',
+  '12'
 ];
+
 
 /**
  * Stage game
@@ -21,33 +24,27 @@ const CARDS_MOCK = [
  * @param {Core} props.game
  */
 const StageGame = ({ game }) => {
-  const [cards, setCards] = useState(() => CARDS_MOCK);
-  const [points, setPoints] = useState(0);
 
-  useUnmount(() => {
-    game.points(points);
-  });
-
-  const onAccept = () => {
-    setPoints((points) => points + 1);
+  const saveAnswer = (name, success) => {
+    game.answers.push({
+      name,
+      success
+    });
   };
 
-  const onDismiss = () => {
-    if (game.settings.away) {
-      setPoints((points) => points - 1);
-    }
+  const onAccept = (name) => {
+    saveAnswer(name, true);
   };
 
-  const resetCards = () => {
-    setCards([...CARDS_MOCK]);
+  const onDismiss = (name) => {
+    saveAnswer(name, false);
   };
 
   return (
     <Cards
-      cards={cards}
+      cards={CARDS_MOCK1}
       onAccept={onAccept}
       onDismiss={onDismiss}
-      onDone={resetCards}
     />
   );
 };

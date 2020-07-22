@@ -6,8 +6,11 @@ export const SIGNAL = {
   HOST_WHO: 1,
   HOST_IS: 2,
 
-  META: 3,
-  CONNECT: 4
+  READY: 3,
+  READY_SYNC: 4,
+
+  META: 5,
+  CONNECT: 6
 };
 
 export default class Game {
@@ -97,28 +100,62 @@ export default class Game {
     this.bus.emit('init');
   }
 
+  _onReady(peerId, callback) {
+    // Safari bug: open event !== ready connection
+    // so just poll by timeout
+
+    let syncTimer = null;
+    let isReady = false;
+
+    const readyHandler = (id) => {
+      if (id === peerId) {
+        isReady = true;
+        this.bus.detach('peer:ready', readyHandler);
+        callback();
+      }
+    };
+    this.bus.on('peer:ready', readyHandler);
+
+    const syncWaitLoop = () => {
+      if (!isReady) {
+        this.send(peerId, {
+          signal: SIGNAL.READY
+        });
+
+        syncTimer = window.setTimeout(() => {
+          syncWaitLoop();
+        }, 200);
+      } else {
+        window.clearTimeout(syncTimer);
+      }
+    };
+
+    syncWaitLoop();
+  }
+
   handleConnection(connection, callback) {
     // react to errors
     connection.on('error', this.handleError.bind(this));
     // wait open state
     connection.on('open', () => {
+      const peerId = +connection.peer;
+
       // ensure json serialization
       connection.serialization = 'json';
       connection.on('data', (data) => {
         // fake data?
         if (data) {
-          this.handleData(+connection.peer, data);
+          this.handleData(peerId, data);
         }
       });
 
       // save connection
-      this.connections.set(+connection.peer, connection);
+      this.connections.set(peerId, connection);
 
-      // detach from event phase
-      window.setTimeout(() => {
-        // connection ready state
-        callback(+connection.peer);
-      }, 0);
+      // connection ready state
+      this._onReady(peerId, () => {
+        callback(peerId);
+      });
     });
   }
 
@@ -171,6 +208,12 @@ export default class Game {
       case SIGNAL.CONNECT:
         this._signalConnect(peerId, data);
         break;
+      case SIGNAL.READY:
+        this._signalReady(peerId);
+        break;
+      case SIGNAL.READY_SYNC:
+        this._signalReadySync(peerId);
+        break;
     }
   }
 
@@ -205,6 +248,16 @@ export default class Game {
         this.connect(data.payload);
       }
     }
+  }
+
+  _signalReady(peerId) {
+    this.send(peerId, {
+      signal: SIGNAL.READY_SYNC
+    });
+  }
+
+  _signalReadySync(peerId) {
+    this.bus.emit('peer:ready', peerId);
   }
 
   send(peerId, data) {
@@ -273,6 +326,7 @@ export default class Game {
     this.sync = null;
 
     // peer connection is awful so just destroy
+    this.peer.removeAllListeners();
     this.peer.destroy();
     this.peer = null;
   }

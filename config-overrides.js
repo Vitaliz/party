@@ -22,7 +22,8 @@ module.exports = process.env.NODE_ENV === 'production' ?
       path.resolve('node_modules/worker-timers-broker'),
       path.resolve('node_modules/worker-timers'),
       path.resolve('node_modules/react-tappable'),
-      path.resolve('node_modules/peerjs-esnext')
+      path.resolve('node_modules/peerjs-esnext'),
+      path.resolve('node_modules/react-deck-swiper')
     ]),
     addBabelPlugin('macros'),
     addBabelPlugin('@babel/transform-react-constant-elements'),
@@ -64,7 +65,8 @@ module.exports = process.env.NODE_ENV === 'production' ?
       path.resolve('node_modules/worker-timers-broker'),
       path.resolve('node_modules/worker-timers'),
       path.resolve('node_modules/react-tappable'),
-      path.resolve('node_modules/peerjs-esnext')
+      path.resolve('node_modules/peerjs-esnext'),
+      path.resolve('node_modules/react-deck-swiper')
     ]),
     addBabelPlugin('macros'),
     addBabelPlugin('@babel/transform-react-constant-elements'),

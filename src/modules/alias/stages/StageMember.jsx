@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import AliasPostfix from '../components/AliasPostfix';
+
 import Core from '../core';
 
 /**
@@ -9,14 +11,18 @@ import Core from '../core';
  * @param {Object} props
  * @param {Core} props.game
  */
-const StageDefault = (/*{ game }*/) => {
+const StageMember = ({ game }) => {
   return (
-    <div></div>
+    <AliasPostfix
+      description="Сейчас играет"
+    >
+      {game.current.item.team}
+    </AliasPostfix>
   );
 };
 
-StageDefault.propTypes = {
+StageMember.propTypes = {
   game: PropTypes.instanceOf(Core).isRequired,
 };
 
-export default StageDefault;
+export default StageMember;

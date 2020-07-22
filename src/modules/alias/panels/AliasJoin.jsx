@@ -7,7 +7,7 @@ import QRModal from '../../../components/overlay/QRModal';
 import TeamCard from '../components/TeamCard';
 import { ScreenSpinner } from '@vkontakte/vkui';
 
-import { useCompute, useForceUpdate, useImmutableCallback, useMount, useUnmount, useEffect } from '../../../hooks/base';
+import { useCompute, useForceUpdate, useImmutableCallback, useMount, useUnmount, useLayoutEffect } from '../../../hooks/base';
 import { useModal, usePopout, useClearOverlay } from '../../../hooks/overlay';
 
 import Core from '../core';
@@ -38,15 +38,32 @@ const AliasJoin = ({ game, id, goBack, goForward }) => {
 
   const canStart = useCompute(() => {
     if (game.host === game.id) {
-      const isMinimal = game.settings.teams &&
-        (game.connections.size + 1) >= game.settings.teams.length;
+      if (!game.settings.teams) {
+        return false;
+      }
+
+      const peersCount = game.connections.size;
+      const usersCount = peersCount + 1;
+
+      const isMinimal = usersCount >= game.settings.teams.length;
+      if (!isMinimal) {
+        return false;
+      }
+
+      const isSynchronized = game.sync.size >= peersCount;
+      if (!isSynchronized) {
+        return false;
+      }
 
       const isJoined = game.settings.teams.reduce((acc, team) => {
         acc += team.users.length;
         return acc;
-      }, 0);
+      }, 0) >= usersCount;
+      if (!isJoined) {
+        return false;
+      }
 
-      return isMinimal && isJoined && game.isSynchronized();
+      return true;
     }
 
     const isJoined = game.settings.teams &&
@@ -100,9 +117,13 @@ const AliasJoin = ({ game, id, goBack, goForward }) => {
     ));
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (game.stage !== null) {
-      goForward();
+      window.requestAnimationFrame(() => {
+        clearOverlay(() => {
+          goForward();
+        });
+      });
     }
   });
 
