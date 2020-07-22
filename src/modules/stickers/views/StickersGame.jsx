@@ -131,8 +131,11 @@ const StickersGame = ({id}) => {
   }, []);
 
   const close = useImmutableCallback(() => {
-    setGame(null);
     bus.emit('app:view', 'home');
+    if (game) {
+      socket.emit('leave', game.id);
+    }
+    setGame(null);
   });
 
   const start = useImmutableCallback(() => {
@@ -149,7 +152,7 @@ const StickersGame = ({id}) => {
     >
       <StickersLobby game={game} close={close} id="lobby" goForward={start}
         start={startTyping}/>
-      <StickersPrepare id="prepare" game={game} start={setWord}/>
+      <StickersPrepare close={close} id="prepare" game={game} start={setWord}/>
       <StickersMain close={close} id="main" game={game} wordGot={gotWord} restartGame={restartGame}/>
     </StickersView>
   );

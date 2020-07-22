@@ -8,7 +8,7 @@ import styled from 'styled-components/macro';
 import {parseQuery} from '../../../utils/uri';
 import {Avatar, Button, Input, Tooltip} from '@vkontakte/vkui';
 
-import {useState} from '../../../hooks/base';
+import {useMemo, useState} from '../../../hooks/base';
 
 import {ReactComponent as DashIcon} from '../../../assets/dash.svg';
 import {useFetch} from '../../../hooks/fetch';
@@ -92,7 +92,7 @@ const TooltipWrapper = styled.div`
  *
  * @param {Object} props
  */
-const StickersPrepare = ({id, game, start}) => {
+const StickersPrepare = ({id, game, start, close}) => {
   const [word, setWord] = useState(null);
   const [status, setStatus] = useState('default');
   const fetch = useFetch();
@@ -126,7 +126,14 @@ const StickersPrepare = ({id, game, start}) => {
     }
   };
 
-  const gameUsers = game.gameUsers;
+  const gameUsers = useMemo(() => {
+
+    if (!game) {
+      return [];
+    }
+
+    return game.gameUsers;
+  }, [game]);
 
   const query = parseQuery(window.location.search);
 
@@ -139,6 +146,7 @@ const StickersPrepare = ({id, game, start}) => {
       id={id}
       title="Подготовка"
       color="blue"
+      onClose={close}
       postfix={(
         <div>
           <ThemedButton
@@ -192,6 +200,7 @@ StickersPrepare.propTypes = {
   id: PropTypes.string.isRequired,
   game: PropTypes.object.isRequired,
   start: PropTypes.func.isRequired,
+  close: PropTypes.func.isRequired
 };
 
 export default StickersPrepare;

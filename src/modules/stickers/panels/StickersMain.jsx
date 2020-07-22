@@ -108,6 +108,15 @@ const StickersMain = ({id, game, wordGot, restartGame, close}) => {
   });
 
   const getWord = (gameUser) => {
+
+    if (!gameUser) {
+      return '...';
+    }
+
+    if (!currentUser) {
+      return '...';
+    }
+
     if (gameUser.user.id === currentUser.user.id && !gameUser.isFinished) {
       return '???';
     }
@@ -123,7 +132,7 @@ const StickersMain = ({id, game, wordGot, restartGame, close}) => {
     <GradientPanel
       id={id}
       title="Игра!"
-      onClose={(game && game.finishedAt) !== null && close}
+      onClose={close}
       color="blue"
       postfix={(
         <div>
