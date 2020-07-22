@@ -162,10 +162,10 @@ const StickersPrepare = ({id, game, start, close}) => {
       <div>
         <Header>
           <div>Слово для</div>
-          <HeaderUser>
+          {currentUser && currentUser.attachedGameUser && currentUser.attachedGameUser.user && <HeaderUser>
             <div>{currentUser.attachedGameUser.user.firstName}</div>
             <Avatar src={currentUser.attachedGameUser.user.avatar} size={28}/>
-          </HeaderUser>
+          </HeaderUser>}
         </Header>
         <Content>
           <Input
