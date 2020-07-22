@@ -65,7 +65,8 @@ const StickersLobby = ({id, game, close, start}) => {
       color="blue"
       postfix={(
         <div>
-          <ConnectingTitle>Подключение...</ConnectingTitle>
+          {isCreator && <ConnectingTitle>Приглашай друзей</ConnectingTitle>}
+          {!isCreator && <ConnectingTitle>Ожидание старта</ConnectingTitle>}
           {isCreator && (
             <>
               <Btn>

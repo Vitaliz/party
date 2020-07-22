@@ -8,7 +8,7 @@ import StickersLobby from '../panels/StickersLobby';
 import PopoutProvider from '../../../components/overlay/PopoutProvider';
 import ModalProvider from '../../../components/overlay/ModalProvider';
 
-import {useImmutableCallback, useEffect, useState, useMemo} from '../../../hooks/base';
+import {useImmutableCallback, useEffect, useState} from '../../../hooks/base';
 import {useBridge, useBus} from '../../../hooks/util';
 import {baseParams, parseQuery} from '../../../utils/uri';
 
@@ -18,8 +18,22 @@ import StickersPrepare from '../panels/StickersPrepare';
 import StickersMain from '../panels/StickersMain';
 import {URL_WS} from '../../../utils/constants';
 
+let hidden, visibilityChange;
+if (typeof document.hidden !== 'undefined') {
+  hidden = 'hidden';
+  visibilityChange = 'visibilitychange';
+} else if (typeof document.msHidden !== 'undefined') {
+  hidden = 'msHidden';
+  visibilityChange = 'msvisibilitychange';
+} else if (typeof document.webkitHidden !== 'undefined') {
+  hidden = 'webkitHidden';
+  visibilityChange = 'webkitvisibilitychange';
+}
+
+const visibiliyIsSupported = !(typeof document.addEventListener === 'undefined' || hidden === undefined);
+
 const socket = io(URL_WS + '?vk-params=' + encodeURIComponent(baseParams(window.location.search)), {
-  transports: ['websocket']
+  transports: ['websocket', 'polling']
 });
 
 const StickersGame = ({id}) => {
@@ -66,8 +80,25 @@ const StickersGame = ({id}) => {
 
       bridge.subscribe(bridgeListener);
 
+
+      // page visibility
+
+      const handleVisibilityChange = () => {
+        if (!document[hidden]) {
+          socket.emit('join-game', game.id);
+        }
+      };
+
+      if (visibiliyIsSupported) {
+        document.addEventListener(visibilityChange, handleVisibilityChange, false);
+      }
+
       return () => {
         bridge.unsubscribe(bridgeListener);
+
+        if (visibiliyIsSupported) {
+          document.removeEventListener(visibilityChange, handleVisibilityChange, false);
+        }
       };
     }
   }, [game]);

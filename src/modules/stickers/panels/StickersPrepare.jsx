@@ -6,7 +6,7 @@ import ThemedButton from '../../../components/common/ThemedButton';
 
 import styled from 'styled-components/macro';
 import {parseQuery} from '../../../utils/uri';
-import {Avatar, Button, Input, Tooltip} from '@vkontakte/vkui';
+import {Avatar, Button, Input} from '@vkontakte/vkui';
 
 import {useMemo, useState} from '../../../hooks/base';
 
@@ -162,10 +162,10 @@ const StickersPrepare = ({id, game, start, close}) => {
       <div>
         <Header>
           <div>Слово для</div>
-          <HeaderUser>
+          {currentUser && currentUser.attachedGameUser && currentUser.attachedGameUser.user && <HeaderUser>
             <div>{currentUser.attachedGameUser.user.firstName}</div>
             <Avatar src={currentUser.attachedGameUser.user.avatar} size={28}/>
-          </HeaderUser>
+          </HeaderUser>}
         </Header>
         <Content>
           <Input
