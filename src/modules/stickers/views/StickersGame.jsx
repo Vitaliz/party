@@ -8,7 +8,7 @@ import StickersLobby from '../panels/StickersLobby';
 import PopoutProvider from '../../../components/overlay/PopoutProvider';
 import ModalProvider from '../../../components/overlay/ModalProvider';
 
-import {useImmutableCallback, useEffect, useState, useMemo} from '../../../hooks/base';
+import {useImmutableCallback, useEffect, useState} from '../../../hooks/base';
 import {useBridge, useBus} from '../../../hooks/util';
 import {baseParams, parseQuery} from '../../../utils/uri';
 
