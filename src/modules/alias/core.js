@@ -394,20 +394,15 @@ export default class Core extends Game {
     if (this.id === this.host) {
       const trust = this.current.item.peer === peerId;
       if (trust) {
-        this.sync.add(peerId);
+        this.send(this.current.item.peer, {
+          signal: CORE_SIGNAL.STAGE_GAME
+        });
 
-        const team = this.getTeamByName(this.current.item.team);
-        if (this.sync.size >= team.peers.length) {
-          this.send(this.current.item.peer, {
-            signal: CORE_SIGNAL.STAGE_GAME
+        this.timer = window.setTimeout(() => {
+          this.send(this.host, {
+            signal: CORE_SIGNAL.STAGE_GAME_TIMEOUT
           });
-
-          this.timer = window.setTimeout(() => {
-            this.send(this.host, {
-              signal: CORE_SIGNAL.STAGE_GAME_TIMEOUT
-            });
-          }, secondsToTime(this.settings.time + DELTA_SYNC_TIME));
-        }
+        }, secondsToTime(this.settings.time + DELTA_SYNC_TIME));
       }
     }
   }
