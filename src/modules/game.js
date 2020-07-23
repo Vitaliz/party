@@ -35,10 +35,8 @@ export default class Game {
       secure: true,
       debug: process.env.NODE_ENV !== 'production' ? 3 : 1,
       config: {
+        // Safari bug: only supports trun(s) cuz relay policy
         iceServers: [{
-          url: 'stun:stun.ezavalishin.ru',
-          urls: 'stun:stun.ezavalishin.ru'
-        }, {
           url: 'turn:turn.ezavalishin.ru',
           urls: 'turn:turn.ezavalishin.ru',
           credential: 'pinkod',
@@ -49,8 +47,14 @@ export default class Game {
           credential: 'pinkod',
           username: 'webrtc'
         }],
-        iceTransportPolicy: 'all',
+
+        // Safari bug: only supports relay policy
+        iceTransportPolicy: 'relay',
+
+        // TODO: check plan-b
         sdpSemantics: 'unified-plan',
+
+        // Safari bug: needs to separate all connections
         bundlePolicy: 'max-compat',
         rtcMuxPolicy: 'negotiate'
       }
